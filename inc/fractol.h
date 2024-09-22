@@ -6,7 +6,7 @@
 /*   By: mporras <mporras@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/23 13:03:57 by mporras-          #+#    #+#             */
-/*   Updated: 2022/10/23 01:50:33 by mporras          ###   ########.fr       */
+/*   Updated: 2024/09/22 21:49:32 by mporras-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,23 @@
 # define K_RIGHT		124
 # define K_I 			34
 # define K_O 			31
+# define NO_FRACTAL     -1
+
+enum e_fractal_dir {
+    MALDELBROT = 0,
+    JULIA = 1,
+    BURNINGSHIP = 2,
+    DROP = 3,
+    BIRD = 4,
+    SPIDER = 5,
+    WORM = 6,
+    HIPER = 7,
+    MANDELBROT3 = 8,
+    MANDELBROT7 = 9,
+    JULIA3 = 10,
+    JULIA7 = 11,
+    DROP7 = 12
+};
 
 typedef struct s_data {
 	void	*img;

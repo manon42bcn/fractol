@@ -6,7 +6,7 @@
 /*   By: mporras <mporras@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/30 09:49:16 by mporras-          #+#    #+#             */
-/*   Updated: 2022/10/23 01:53:27 by mporras          ###   ########.fr       */
+/*   Updated: 2024/09/22 22:27:08 by mporras-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ static int	ft_input_reader(char *s)
 	int test;
 
 	test = ft_fractal_dir(s);
-	if (test == 0)
+	if (test == NO_FRACTAL)
 		ft_input_messages(2);
 	return (test);
 }
@@ -51,31 +51,47 @@ static int	ft_julia_const(t_set *set, int argc, char *argv[])
 	return (1);
 }
 
+void    ft_checking_input(char *argv[])
+{
+    int i;
+
+    i = 0;
+    while (argv[++i])
+    {
+        if (ft_strict_cmp(argv[i], "--help") == 0)
+        {
+            ft_help();
+            exit(0);
+        }
+    }
+}
+
 t_set	*ft_init_fractol(int argc, char *argv[])
 {
 	t_set	*rst;
 	int		select;
 	int		color_mode;
 
+    ft_checking_input(argv);
 	if (argc == 1)
 		ft_input_messages(1);
 	if (argc > 5)
 		ft_input_messages(3);
 	select = ft_input_reader(argv[1]);
-	if (select != 2 && argc > 3)
+	if (select != JULIA && argc > 3)
 		ft_input_messages(3);
 	if (argc == 3)
 		color_mode = ft_input_option(argv[2]);
 	if (argc == 2)
 		color_mode = 3;
-	if (select == 2 && argc == 4)
+	if (select == JULIA && argc == 4)
 		color_mode = 3;
-	if (select == 2 && argc == 5)
+	if (select == JULIA && argc == 5)
 		color_mode = ft_input_option(argv[2]);
 	rst = ft_init_set(select, color_mode);
 	if (rst == NULL)
 		ft_alloc_error(rst, 0);
-	if (select == 2)
+	if (select == JULIA)
 		ft_julia_const(rst, argc, argv);
 	return (rst);
 }

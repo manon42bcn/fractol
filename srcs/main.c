@@ -6,7 +6,7 @@
 /*   By: mporras <mporras@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/23 15:03:57 by mporras-          #+#    #+#             */
-/*   Updated: 2022/10/23 01:59:23 by mporras          ###   ########.fr       */
+/*   Updated: 2024/09/22 22:44:01 by mporras-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,12 +18,11 @@ void    ft_fractol_manager(t_set *set)
 						  &ft_burningship_test, &ft_drop_test,
 						  &ft_bird_test,&ft_spider_test,
 						  &ft_worm_test, &ft_hiper_test,
-						  NULL,
 						  &ft_mandelbrot_test3, &ft_mandelbrot_test7,
 						  &ft_julia_test3, &ft_julia_test7,
 						  &ft_drop_test7, NULL};
 
-	ft_iterator(set, build[set->fractal - 1]);
+    ft_iterator(set, build[set->fractal]);
 }
 
 int	ft_render(t_set *set)

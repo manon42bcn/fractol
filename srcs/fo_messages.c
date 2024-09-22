@@ -6,7 +6,7 @@
 /*   By: mporras <mporras@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/29 12:17:07 by mporras-          #+#    #+#             */
-/*   Updated: 2022/10/23 01:53:16 by mporras          ###   ########.fr       */
+/*   Updated: 2024/09/22 21:39:35 by mporras-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,17 +28,17 @@ void	ft_alloc_error(t_set *set, int error)
 
 void	ft_input_messages(int select)
 {
-	ft_putendl_fd("\x1b[31m\e[1mError: \e[0m", 1);
+	ft_putendl_fd("\x1b[31m\e[1mError: \e[0m", 2);
 	if (select == 1)
-		ft_putendl_fd("Missing argument.\x1b[0m", 1);
+		ft_putendl_fd("Missing argument.\x1b[0m", 2);
 	else if (select == 2)
-		ft_putendl_fd("Wrong argument!.\x1b[0m", 1);
+		ft_putendl_fd("Wrong argument!.\x1b[0m", 2);
 	else if (select == 3)
-		ft_putendl_fd("Too many arguments!.\x1b[0m", 1);
-	ft_putendl_fd("\e[32m\e[1mIntructions:\e[0m", 1);
-	ft_putstr_fd("Run: ./fractol [fractal] [options]", 1);
-	ft_putendl_fd(" [params] or --help to get more details.\x1b[0m", 1);
-	exit(0);
+		ft_putendl_fd("Too many arguments!.\x1b[0m", 2);
+	ft_putendl_fd("\e[32m\e[1mIntructions:\e[0m", 2);
+	ft_putstr_fd("Run: ./fractol [fractal] [options]", 2);
+	ft_putendl_fd(" [params] or --help to get more details.\x1b[0m", 2);
+	exit(1);
 }
 
 void	ft_help(void)
