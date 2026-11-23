@@ -16,26 +16,9 @@
 # include <unistd.h>
 # include <stdlib.h>
 # include <math.h>
-# include "mlx.h"
+# include <SDL3/SDL.h>
 # include "libft.h"
 
-# define K_SPACE		49
-# define K_ESC			53
-# define K_Q			12
-# define K_C			8
-# define K_M 			46
-# define K_B			11
-# define K_F 			3
-# define K_PLUS			24
-# define K_MINUS		27
-# define K_PAD_PLUS		69
-# define K_PAD_MINUS	78
-# define K_UP			126
-# define K_DOWN			125
-# define K_LEFT			123
-# define K_RIGHT		124
-# define K_I 			34
-# define K_O 			31
 # define NO_FRACTAL     -1
 
 enum e_fractal_dir {
@@ -55,11 +38,8 @@ enum e_fractal_dir {
 };
 
 typedef struct s_data {
-	void	*img;
-	char	*addr;
-	int		bits_per_pixel;
-	int		line_length;
-	int		endian;
+	void	*addr;
+	int		pitch;
 }				t_data;
 
 typedef struct s_viewer
@@ -80,9 +60,9 @@ typedef struct s_set
 	t_viewer		*viewer;
 	int				screen_w;
 	int				screen_h;
-	void			*mlx;
-	void			*mlx_win;
-	t_data			*img;
+	SDL_Window		*window;
+	SDL_Renderer	*renderer;
+	SDL_Texture		*texture;
 	double			zi;
 	double			zr;
 	int				max_i;
@@ -110,23 +90,22 @@ int	        ft_mandelbrot_test7(t_set *set);
 int	        ft_julia_test3(t_set *set);
 int	        ft_julia_test7(t_set *set);
 int	        ft_drop_test7(t_set *set);
-void		ft_iterator(t_set *set, int (f)(t_set *));
+void		ft_iterator(t_set *set, int (f)(t_set *), t_data *img);
 int			ft_colorize_pixel(t_set *set, long double a, long double b, int n);
 int			ft_load_base_color(t_set *set);
-int			ft_keys_handler(int key, t_set *set);
-int			ft_window_handler(t_set *set);
+void		ft_keys_handler(SDL_Keycode key, t_set *set);
 t_set		*ft_init_fractol(int argc, char *argv[]);
 void		ft_alloc_error(t_set *set, int error);
 void		ft_input_messages(int select);
 void		ft_help(void);
 int			create_trgb(int t, int r, int g, int b);
-void		my_mlx_pixel_put(t_data *data, int x, int y, int color);
-int			ft_mouse_handler(int mouse_code, int x, int y, t_set *set);
+void		ft_put_pixel(t_data *data, int x, int y, int color);
+void		ft_mouse_zoom(t_set *set, float scroll, int x, int y);
+void		ft_mouse_select(t_set *set, int x, int y);
 long double	ft_strfloat(char *str);
-int			ft_free_all(t_set *set);
+void		ft_free_all(t_set *set);
 void		ft_reset_viewer(t_set *set);
 t_set		*ft_init_set(int select, int color_mode);
 t_viewer	*ft_init_viewer(t_set *set);
-int			ft_render(t_set *set);
 
 #endif

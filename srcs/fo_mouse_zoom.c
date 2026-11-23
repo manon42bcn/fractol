@@ -26,12 +26,15 @@ inline static void	ft_zoom_in(t_set *set, int x_pointer, int y_pointer)
 {
 	long double	zoom_x;
 	long double	zoom_y;
+	int				aspect;
 
-	y_pointer -= 30;
+	aspect = set->screen_w / set->screen_h;
+	if (aspect < 1)
+		aspect = 1;
 	zoom_x = (x_pointer - set->viewer->x_zero)
-		* (set->viewer->zoom_f / (set->screen_w / set->screen_h));
+		* (set->viewer->zoom_f / aspect);
 	zoom_y = (y_pointer - set->viewer->y_zero)
-		* (set->viewer->zoom_f / (set->screen_w / set->screen_h));
+		* (set->viewer->zoom_f / aspect);
 	set->zoom += set->viewer->zoom_f;
 	set->viewer->x_width /= (1 + set->viewer->zoom_f);
 	set->viewer->y_height /= (1 + set->viewer->zoom_f);
@@ -43,12 +46,15 @@ inline static void	ft_zoom_out(t_set *set, int x_pointer, int y_pointer)
 {
 	long double	zoom_x;
 	long double	zoom_y;
+	int				aspect;
 
-	y_pointer -= 30;
+	aspect = set->screen_w / set->screen_h;
+	if (aspect < 1)
+		aspect = 1;
 	zoom_x = (x_pointer - set->viewer->x_zero)
-		* (set->viewer->zoom_f / (set->screen_w / set->screen_h));
+		* (set->viewer->zoom_f / aspect);
 	zoom_y = (y_pointer - set->viewer->y_zero)
-		* (set->viewer->zoom_f / (set->screen_w / set->screen_h));
+		* (set->viewer->zoom_f / aspect);
 	set->zoom -= set->viewer->zoom_f;
 	set->viewer->x_width /= (set->viewer->zoom_f);
 	set->viewer->y_height /= (set->viewer->zoom_f);
@@ -56,25 +62,25 @@ inline static void	ft_zoom_out(t_set *set, int x_pointer, int y_pointer)
 	set->viewer->y_zero -= (zoom_y * -1);
 }
 
-int	ft_mouse_handler(int mouse_code, int x, int y, t_set *set)
+void	ft_mouse_zoom(t_set *set, float scroll, int x, int y)
 {
-	int	x_pointer;
-	int	y_pointer;
-
-	mlx_mouse_get_pos(set->mlx_win, &x_pointer, &y_pointer);
-	if (mouse_code == 4 && x)
-		ft_zoom_in(set, x_pointer, y_pointer);
-	if (mouse_code == 5 && y)
-		ft_zoom_out(set, x_pointer, y_pointer);
-	if (mouse_code == 2 && (set->fractal == 2 ||
-		set->fractal == 12 || set->fractal == 13))
-	{
-		set->c_r = (x_pointer - set->viewer->x_zero)
-			* (set->viewer->x_width / set->screen_w);
-		set->c_i = (y_pointer - set->viewer->y_zero)
-			* (set->viewer->y_height / set->screen_h);
-	}
+	if (scroll > 0)
+		ft_zoom_in(set, x, y);
+	else if (scroll < 0)
+		ft_zoom_out(set, x, y);
+	else
+		return;
 	set->status = 1;
-	ft_render(set);
-	return (1);
+}
+
+void	ft_mouse_select(t_set *set, int x, int y)
+{
+	if (set->fractal != JULIA && set->fractal != JULIA3
+		&& set->fractal != JULIA7)
+		return;
+	set->c_r = (x - set->viewer->x_zero)
+		* (set->viewer->x_width / set->screen_w);
+	set->c_i = (y - set->viewer->y_zero)
+		* (set->viewer->y_height / set->screen_h);
+	set->status = 1;
 }

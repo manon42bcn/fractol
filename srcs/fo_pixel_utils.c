@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   fo_minilibx_utils.c                                :+:      :+:    :+:   */
+/*   fo_pixel_utils.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mporras <mporras@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -14,13 +14,14 @@
 
 int	create_trgb(int t, int r, int g, int b)
 {
-	return (t << 24 | r << 16 | g << 8 | b);
+	return ((Uint32)t << 24 | (Uint32)r << 16 | (Uint32)g << 8 | (Uint32)b);
 }
 
-void	my_mlx_pixel_put(t_data *data, int x, int y, int color)
+void	ft_put_pixel(t_data *data, int x, int y, int color)
 {
-	char	*dst;
+	Uint32	*row;
 
-	dst = data->addr + (y * data->line_length + x * (data->bits_per_pixel / 8));
-	*(unsigned int *)dst = color;
+	row = (Uint32 *)((char *)data->addr + y * data->pitch);
+	/* The existing high byte is transparency. SDL expects opacity. */
+	row[x] = (Uint32)color ^ 0xFF000000u;
 }

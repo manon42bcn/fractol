@@ -12,73 +12,65 @@
 
 #include "fractol.h"
 
-inline static void	ft_keys_color_mode(int key, t_set *set)
+inline static void	ft_keys_color_mode(SDL_Keycode key, t_set *set)
 {
-	if (key == K_C)
+	if (key == SDLK_C)
 		set->color_mode = 1;
-	if (key == K_M)
+	if (key == SDLK_M)
 		set->color_mode = 2;
-	if (key == K_B)
+	if (key == SDLK_B)
 		set->color_mode = 3;
-	if (key == K_F)
+	if (key == SDLK_F)
 		set->color_mode = 4;
 }
 
-inline static void	ft_keys_panning_mode(int key, t_set *set)
+inline static void	ft_keys_panning_mode(SDL_Keycode key, t_set *set)
 {
-	if (key == K_UP)
+	if (key == SDLK_UP)
 		set->viewer->y_zero += 50;
-	else if (key == K_DOWN)
+	else if (key == SDLK_DOWN)
 		set->viewer->y_zero -= 50;
-	else if (key == K_LEFT)
+	else if (key == SDLK_LEFT)
 		set->viewer->x_zero += 50;
-	else if (key == K_RIGHT)
+	else if (key == SDLK_RIGHT)
 		set->viewer->x_zero -= 50;
 }
 
-inline static void	ft_keys_iteration(int key, t_set *set)
+inline static void	ft_keys_iteration(SDL_Keycode key, t_set *set)
 {
-	if (key == K_PLUS || key == K_PAD_PLUS)
+	if (key == SDLK_EQUALS || key == SDLK_PLUS || key == SDLK_KP_PLUS)
 	{
 		if (set->max_i + 10 <= 1000)
 			set->max_i += 10;
 	}
-	else if (key == K_MINUS || key == K_PAD_MINUS)
+	else if (key == SDLK_MINUS || key == SDLK_KP_MINUS)
 	{
 		if (set->max_i - 10 >= 5)
 			set->max_i -= 10;
 	}
 }
 
-int	ft_keys_handler(int key, t_set *set)
+void	ft_keys_handler(SDL_Keycode key, t_set *set)
 {
-	if (key == K_ESC)
-		ft_free_all(set);
-	else if (key == K_UP || key == K_DOWN || key == K_LEFT || key == K_RIGHT)
+	if (key == SDLK_UP || key == SDLK_DOWN || key == SDLK_LEFT || key == SDLK_RIGHT)
 		ft_keys_panning_mode(key, set);
-	else if (key == K_SPACE)
+	else if (key == SDLK_SPACE)
 		ft_load_base_color(set);
-	else if (key == K_Q)
+	else if (key == SDLK_Q)
 		ft_reset_viewer(set);
-	else if (key == K_C || key == K_M || key == K_B || key == K_F)
+	else if (key == SDLK_C || key == SDLK_M || key == SDLK_B || key == SDLK_F)
 		ft_keys_color_mode(key, set);
-	else if (key == K_PLUS || key == K_PAD_PLUS
-		|| key == K_MINUS || key == K_PAD_MINUS)
+	else if (key == SDLK_EQUALS || key == SDLK_PLUS || key == SDLK_KP_PLUS
+		|| key == SDLK_MINUS || key == SDLK_KP_MINUS)
 		ft_keys_iteration(key, set);
-	else if (key == K_I)
+	else if (key == SDLK_I)
 		set->esc += 5;
-	else if (key == K_O)
+	else if (key == SDLK_O)
 	{
 		if (set->esc - 5 > 1)
 			set->esc -= 5;
 	}
+	else
+		return;
 	set->status = 1;
-	ft_render(set);
-	return (0);
-}
-
-int	ft_window_handler(t_set *set)
-{
-	ft_free_all(set);
-	return (0);
 }

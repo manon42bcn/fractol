@@ -12,38 +12,33 @@
 
 #include "fractol.h"
 
-int	ft_free_all(t_set *set)
+void	ft_free_all(t_set *set)
 {
 	if (set)
 	{
-		if (set->mlx)
-			mlx_destroy_window(set->mlx, set->mlx_win);
-		if (set->viewer)
-			free(set->viewer);
-		set->mlx = NULL;
-		set->mlx_win = NULL;
-		set->img = NULL;
-		set->viewer = NULL;
+		if (set->texture)
+			SDL_DestroyTexture(set->texture);
+		if (set->renderer)
+			SDL_DestroyRenderer(set->renderer);
+		if (set->window)
+			SDL_DestroyWindow(set->window);
+		free(set->viewer);
 		free(set);
 	}
-	exit(0);
-	return (1);
+	SDL_Quit();
 }
 
 t_set	*ft_init_set(int select, int color_mode)
 {
 	t_set	*rst;
 
-	rst = (t_set *)malloc(sizeof(t_set));
+	rst = calloc(1, sizeof(t_set));
 	if (rst == NULL)
 		return (NULL);
 	rst->fractal = select;
 	rst->zoom = 1.0;
 	rst->color_scheme = 0;
 	rst->color_mode = color_mode;
-	rst->mlx = mlx_init();
-	rst->mlx_win = NULL;
-	rst->img = NULL;
 	rst->zi = 0.0;
 	rst->zr = 0.0;
 	rst->max_i = 50;
@@ -51,9 +46,6 @@ t_set	*ft_init_set(int select, int color_mode)
 	rst->c_r = -0.8350;
 	rst->c_i = -0.2321;
 	rst->color = 0;
-	mlx_get_screen_size(rst->mlx, &rst->screen_w, &rst->screen_h);
-	rst->screen_w = rst->screen_w / FACTOR;
-	rst->screen_h = rst->screen_h / FACTOR;
 	ft_load_base_color(rst);
 	rst->status = 1;
 	return (rst);

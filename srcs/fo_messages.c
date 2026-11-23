@@ -11,19 +11,18 @@
 /* ************************************************************************** */
 
 #include "fractol.h"
+#include <stdio.h>
 
 void	ft_alloc_error(t_set *set, int error)
 {
 	if (error == 0)
 		ft_putendl_fd("\x1b[31m\e[1mError: allocating set.\e[0m", 1);
-	else if (error == 1)
-		ft_putendl_fd("\x1b[31m\e[1mError: MLX error.\e[0m", 1);
-	else if (error == 2)
-		ft_putendl_fd("\x1b[31m\e[1mError: MLX image error.\e[0m", 1);
+	else if (error == 1 || error == 2)
+		fprintf(stderr, "SDL3: %s\n", SDL_GetError());
 	else if (error == 3)
 		ft_putendl_fd("\x1b[31m\e[1mError: allocating viewer.\e[0m", 1);
 	ft_free_all(set);
-	exit(0);
+	exit(EXIT_FAILURE);
 }
 
 void	ft_input_messages(int select)

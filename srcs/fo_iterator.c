@@ -84,7 +84,7 @@ int	ft_spider_test(t_set *set)
 	return (ft_colorize_pixel(set, a, b, n));
 }
 
-void	ft_iterator(t_set *set, int (f)(t_set *))
+void	ft_iterator(t_set *set, int (f)(t_set *), t_data *img)
 {
 	int	x;
 	int	y;
@@ -100,7 +100,7 @@ void	ft_iterator(t_set *set, int (f)(t_set *))
 			set->zi = (y - set->viewer->y_zero)
 				* (set->viewer->y_height / set->screen_h);
 			f(set);
-			my_mlx_pixel_put(set->img, x, y, set->color);
+			ft_put_pixel(img, x, y, set->color);
 			y++;
 		}
 		x++;
