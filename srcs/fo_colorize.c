@@ -17,9 +17,38 @@ static int	ft_blend_channel(Uint32 start, Uint32 end, double fraction)
 	return ((int)(start + ((double)end - start) * fraction + 0.5));
 }
 
-static int	ft_scheme_color(int scheme, double iterations)
+static int	ft_palette_blend(t_palette_interpolation interpolation,
+		Uint32 start, Uint32 end, double fraction)
 {
-	static const Uint32	colors[COLOR_SCHEME_COUNT][10] = {
+	if (interpolation == PALETTE_OKLAB)
+		return (ft_rgb_lerp_oklab(start, end, fraction));
+	if (interpolation == PALETTE_LINEAR)
+		return (ft_rgb_lerp_linear(start, end, fraction));
+	return (create_trgb(0,
+			ft_blend_channel(start >> 16 & 255, end >> 16 & 255, fraction),
+			ft_blend_channel(start >> 8 & 255, end >> 8 & 255, fraction),
+			ft_blend_channel(start & 255, end & 255, fraction)));
+}
+
+static int	ft_single_color_gradient(const t_set *set, Uint32 reference,
+		double position)
+{
+	double	fraction;
+
+	/* Reflect the black-to-white gradient so its repeat has no hard seam. */
+	fraction = fmod(position, 4.0);
+	if (fraction > 2)
+		fraction = 4 - fraction;
+	if (fraction <= 1)
+		return (ft_palette_blend(set->palette_interpolation, 0,
+				reference, fraction));
+	return (ft_palette_blend(set->palette_interpolation, reference,
+			0xffffff, fraction - 1));
+}
+
+static int	ft_scheme_color(const t_set *set, double iterations)
+{
+	static const Uint32	colors[COLOR_SCHEME_COUNT][PALETTE_COLOR_COUNT] = {
 	{0x0016213d, 0x007a2d3f, 0x00a3a09f, 0x0087706b, 0x00695c52,
 		0x007b161a, 0x00878962, 0x0013121f, 0x002c434b, 0x00e0dedf},
 	{0x00603b2b, 0x00987259, 0x006b5149, 0x008b6b56, 0x00a27f63,
@@ -32,21 +61,19 @@ static int	ft_scheme_color(int scheme, double iterations)
 		0x00C8522F, 0x006A798B, 0x00B5AFB1, 0x003C3C3E, 0x00B1583E},
 	{0x00030500, 0x00897131, 0x005B601F, 0x009B5C0C, 0x00D8CD4A,
 		0x00E0F89E, 0x00BC3B00, 0x005B1900, 0x006F5B0B, 0x00E3FFB3}};
-	double	position;
-	double	fraction;
-	int		index;
-	Uint32	start;
-	Uint32	end;
+	const Uint32	*palette;
+	double			position;
+	int				index;
 
-	position = fmod(iterations / 3.0, 10.0);
+	palette = colors[set->color_scheme];
+	position = iterations / set->palette_span;
+	if (set->palette_single_color)
+		return (ft_single_color_gradient(set, palette[set->palette_anchor],
+				position));
+	position = fmod(position, PALETTE_COLOR_COUNT);
 	index = (int)position;
-	fraction = position - index;
-	start = colors[scheme][index];
-	end = colors[scheme][(index + 1) % 10];
-	return (create_trgb(0,
-			ft_blend_channel(start >> 16 & 255, end >> 16 & 255, fraction),
-			ft_blend_channel(start >> 8 & 255, end >> 8 & 255, fraction),
-			ft_blend_channel(start & 255, end & 255, fraction)));
+	return (ft_palette_blend(set->palette_interpolation, palette[index],
+			palette[(index + 1) % PALETTE_COLOR_COUNT], position - index));
 }
 
 static double	ft_color_iterations(const t_set *set, long double a,
@@ -103,6 +130,6 @@ int	ft_colorize_pixel(t_set *set, long double a, long double b, int n,
 		set->color = create_trgb((int)(224 * fraction), ft_full_channel(a),
 				ft_full_channel(b), level);
 	else
-		set->color = ft_scheme_color(set->color_scheme, iterations);
+		set->color = ft_scheme_color(set, iterations);
 	return (1);
 }

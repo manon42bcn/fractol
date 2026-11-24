@@ -39,6 +39,8 @@ t_set	*ft_init_set(int select, int color_mode)
 	rst->fractal = select;
 	rst->zoom = 1.0;
 	rst->color_scheme = 0;
+	rst->palette_span = DEFAULT_PALETTE_SPAN;
+	rst->palette_anchor = 1;
 	rst->color_mode = color_mode;
 	rst->zi = 0.0;
 	rst->zr = 0.0;
@@ -46,6 +48,11 @@ t_set	*ft_init_set(int select, int color_mode)
 	rst->esc = 4;
 	rst->c_r = -0.8350;
 	rst->c_i = -0.2321;
+	if (select == PHOENIX)
+	{
+		rst->c_r = 0.5667L;
+		rst->c_i = 0;
+	}
 	rst->color = 0;
 	rst->status = 1;
 	return (rst);

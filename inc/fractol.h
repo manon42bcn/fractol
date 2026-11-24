@@ -18,10 +18,15 @@
 # include <math.h>
 # include <SDL3/SDL.h>
 # include "libft.h"
+# include "rgb.h"
 
 # define NO_FRACTAL     -1
 # define MAX_ITERATIONS 1000
 # define COLOR_SCHEME_COUNT 6
+# define PALETTE_COLOR_COUNT 10
+# define DEFAULT_PALETTE_SPAN 8
+# define MIN_PALETTE_SPAN 2
+# define MAX_PALETTE_SPAN 32
 # define DEFAULT_VIEW_WIDTH 4.8f
 # define DEFAULT_VIEW_HEIGHT 3.0f
 
@@ -64,12 +69,25 @@ typedef struct s_buddhabrot_pixel
 	Uint64	visits[3];
 }	t_buddhabrot_pixel;
 
+typedef enum e_palette_interpolation
+{
+	PALETTE_SRGB,
+	PALETTE_LINEAR,
+	PALETTE_OKLAB,
+	PALETTE_INTERPOLATION_COUNT
+}	t_palette_interpolation;
+
 typedef struct s_set
 {
 	int				fractal;
 	long double		zoom;
 	int				color_scheme;
 	int				color_mode;
+	t_palette_interpolation	palette_interpolation;
+	int				palette_span;
+	int				palette_anchor;
+	bool				palette_single_color;
+	bool				tricorn_julia;
 	t_viewer		*viewer;
 	int				screen_w;
 	int				screen_h;

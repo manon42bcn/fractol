@@ -190,12 +190,17 @@ static int	ft_density_level(Uint64 count, float scale, bool original_exposure)
 	return ((int)level);
 }
 
-static Uint32	ft_gradient_rgb(Uint32 start, Uint32 end, int step, int span)
+static Uint32	ft_gradient_rgb(Uint32 start, Uint32 end, int step, int span,
+		t_palette_interpolation interpolation)
 {
 	Uint32	color;
 	int		shift;
 	int		channel;
 
+	if (interpolation == PALETTE_OKLAB)
+		return (ft_rgb_lerp_oklab(start, end, (double)step / span));
+	if (interpolation == PALETTE_LINEAR)
+		return (ft_rgb_lerp_linear(start, end, (double)step / span));
 	color = 0;
 	shift = 0;
 	while (shift <= 16)
@@ -208,26 +213,27 @@ static Uint32	ft_gradient_rgb(Uint32 start, Uint32 end, int step, int span)
 	return (color);
 }
 
-static void	ft_nebulabrot_gradients(int scheme, Uint32 gradients[3][256])
+static void	ft_nebulabrot_gradients(const t_set *set, Uint32 gradients[3][256])
 {
 	const Uint32	(*stops)[2];
 	int				band;
 	int				level;
 
-	stops = g_nebulabrot_palettes[scheme];
+	stops = g_nebulabrot_palettes[set->color_scheme];
 	band = 0;
 	while (band < 3)
 	{
 		level = 0;
 		while (level <= 128)
 		{
-			gradients[band][level] = ft_gradient_rgb(0, stops[band][0], level, 128);
+			gradients[band][level] = ft_gradient_rgb(0, stops[band][0],
+					level, 128, set->palette_interpolation);
 			level++;
 		}
 		while (level <= 255)
 		{
 			gradients[band][level] = ft_gradient_rgb(stops[band][0],
-					stops[band][1], level - 128, 127);
+					stops[band][1], level - 128, 127, set->palette_interpolation);
 			level++;
 		}
 		band++;
@@ -266,7 +272,7 @@ static void	ft_buddhabrot_draw(const t_set *set, t_data *img)
 
 	if (set->color_mode == 1)
 	{
-		ft_nebulabrot_gradients(set->color_scheme, gradients);
+		ft_nebulabrot_gradients(set, gradients);
 		scale[0] = ft_density_scale(set->buddhabrot_color_peaks.visits[0]);
 		scale[1] = ft_density_scale(set->buddhabrot_color_peaks.visits[1]);
 		scale[2] = ft_density_scale(set->buddhabrot_color_peaks.visits[2]);

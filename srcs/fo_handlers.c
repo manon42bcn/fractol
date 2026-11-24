@@ -50,8 +50,39 @@ inline static void	ft_keys_iteration(SDL_Keycode key, t_set *set)
 	}
 }
 
+static bool	ft_keys_palette(SDL_Keycode key, t_set *set)
+{
+	if (set->color_mode != 1 || set->fractal == NEWTON
+		|| set->fractal == BUDDHABROT)
+		return (false);
+	if (key == SDLK_J)
+		set->palette_span = SDL_max(MIN_PALETTE_SPAN, set->palette_span - 1);
+	else if (key == SDLK_K)
+		set->palette_span = SDL_min(MAX_PALETTE_SPAN, set->palette_span + 1);
+	else if (key == SDLK_P)
+		set->palette_single_color = !set->palette_single_color;
+	else if (key == SDLK_N && set->palette_single_color)
+		set->palette_anchor = (set->palette_anchor + 1) % PALETTE_COLOR_COUNT;
+	else
+		return (false);
+	return (true);
+}
+
 void	ft_keys_handler(SDL_Keycode key, t_set *set)
 {
+	if (key == SDLK_L && set->fractal != NEWTON)
+	{
+		set->palette_interpolation = (set->palette_interpolation + 1)
+			% PALETTE_INTERPOLATION_COUNT;
+		if (set->color_mode == 1)
+		{
+			if (set->fractal == BUDDHABROT)
+				set->buddhabrot_recolor = true;
+			else
+				set->status = 1;
+		}
+		return;
+	}
 	if (set->fractal == BUDDHABROT && key == SDLK_S)
 	{
 		set->buddhabrot_original_exposure = !set->buddhabrot_original_exposure;
@@ -76,6 +107,11 @@ void	ft_keys_handler(SDL_Keycode key, t_set *set)
 		return;
 	if (set->fractal == NEWTON && (key == SDLK_I || key == SDLK_O))
 		return;
+	if (ft_keys_palette(key, set))
+	{
+		set->status = 1;
+		return;
+	}
 	if (key == SDLK_UP || key == SDLK_DOWN || key == SDLK_LEFT || key == SDLK_RIGHT)
 		ft_keys_panning_mode(key, set);
 	else if (key == SDLK_SPACE)

@@ -40,16 +40,31 @@ int	ft_tricorn_test(t_set *set)
 	long double	a;
 	long double	b;
 	long double	next_a;
+	long double	c_r;
+	long double	c_i;
+	long double	escape;
 
 	n = 1;
 	a = 0;
 	b = 0;
+	c_r = set->zr;
+	c_i = set->zi;
+	escape = set->esc;
+	if (set->tricorn_julia)
+	{
+		a = set->zr;
+		b = set->zi;
+		c_r = set->c_r;
+		c_i = set->c_i;
+		/* A large selected constant can require a larger escape radius. */
+		escape = fmaxl(escape, c_r * c_r + c_i * c_i);
+	}
 	while (n < set->max_i)
 	{
-		next_a = a * a - b * b + set->zr;
-		b = -2 * a * b + set->zi;
+		next_a = a * a - b * b + c_r;
+		b = -2 * a * b + c_i;
 		a = next_a;
-		if (a * a + b * b > set->esc)
+		if (a * a + b * b > escape)
 			return (ft_colorize_pixel(set, a, b, n, true));
 		n++;
 	}

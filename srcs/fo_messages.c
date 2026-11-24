@@ -58,7 +58,8 @@ void	ft_help(void)
 	ft_putstr_fd("Zoom in: mouse scroll up | ", 1);
 	ft_putendl_fd(" Zoom out: mouse scroll down. | Q: reset zoom.", 1);
 	ft_putendl_fd("Up - down - left - right: move current view.", 1);
-	ft_putendl_fd("Mouse second button: change Julia set values.", 1);
+	ft_putendl_fd("Right mouse button: change the Julia or Phoenix constant.", 1);
+	ft_putendl_fd("Tricorn: right-click to explore anti-Julia. Q returns to the Tricorn.", 1);
 	ft_putstr_fd("(+) and (-): increases and reduces max iteration.", 1);
 	ft_putstr_fd("I and ): increases and reduces escape point.", 1);
 	ft_putstr_fd(" More iterations means more details and lag.", 1);
@@ -70,6 +71,9 @@ void	ft_help(void)
 	ft_putendl_fd("Buddhabrot: C shows orbit colors, B shows density in grayscale.", 1);
 	ft_putendl_fd("Nebulabrot: SPACE BAR cycles palettes without restarting sampling.", 1);
 	ft_putendl_fd("Buddhabrot: S toggles shadow suppression.", 1);
+	ft_putendl_fd("L: cycle sRGB, linear-light and Oklab interpolation in color mode.", 1);
+	ft_putendl_fd("Classic color palettes: J shortens transitions, K lengthens them.", 1);
+	ft_putendl_fd("P switches between the full palette and one color. N picks the next color.", 1);
 	ft_putendl_fd("ESC: exit fract-ol.", 1);
 	exit(0);
 }

@@ -29,7 +29,8 @@ SRCS_FILES		=	fo_colorize.c \
 					fo_string_to_double.c \
 					fo_struct_utils.c \
 					main.c
-OBJS			=	$(addprefix $(OBJ_DIR)/,$(SRCS_FILES:.c=.o))
+RGB_SRCS		=	rgb_algebra.c rgb_arithmetics.c rgb_interpolate.c rgb_oklab.c
+OBJS			=	$(addprefix $(OBJ_DIR)/,$(SRCS_FILES:.c=.o) $(RGB_SRCS:.c=.o))
 LIB_DIR			=	lib
 LIB				=	libft.a
 RM				=	rm -rf
@@ -38,7 +39,7 @@ PKG_CONFIG		?=	pkg-config
 SDL_MIN_VERSION	=	3.2.0
 SDL_CFLAGS		=	$(shell $(PKG_CONFIG) --cflags sdl3)
 SDL_LIBS		=	$(shell $(PKG_CONFIG) --libs sdl3)
-INCLUDES		=	-Iinc -Ilib/inc
+INCLUDES		=	-Iinc -Ilib/inc -Irgb/inc
 FACTOR			=	-D FACTOR=3
 
 all: $(NAME)
@@ -46,8 +47,11 @@ all: $(NAME)
 $(NAME): $(OBJS) $(LIB_DIR)/$(LIB)
 	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS) $(LIB_DIR)/$(LIB) $(SDL_LIBS) -lm -o $@
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c inc/fractol.h $(LIB_DIR)/inc/libft.h | $(OBJ_DIR) check-sdl
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c inc/fractol.h rgb/inc/rgb.h $(LIB_DIR)/inc/libft.h | $(OBJ_DIR) check-sdl
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(SDL_CFLAGS) $(INCLUDES) $(FACTOR) -c $< -o $@
+
+$(OBJ_DIR)/%.o: rgb/src/%.c rgb/inc/rgb.h rgb/src/rgb_internal.h $(LIB_DIR)/inc/libft.h | $(OBJ_DIR)
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
 $(OBJ_DIR):
 	mkdir -p $@

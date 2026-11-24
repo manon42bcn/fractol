@@ -144,25 +144,30 @@ int	ft_phoenix_test(t_set *set)
 	long double	prev_b;
 	long double	next_a;
 	long double	next_b;
+	long double	norm;
+	long double	constant_bound;
 	int			n;
 
 	a = set->zr;
 	b = set->zi;
 	prev_a = 0;
 	prev_b = 0;
+	constant_bound = fabsl(set->c_r) + fabsl(set->c_i);
 	n = 0;
 	while (n < set->max_i)
 	{
-		next_a = a * a - b * b + 0.5667L - 0.5L * prev_a;
-		next_b = 2 * a * b - 0.5L * prev_b;
+		next_a = a * a - b * b + set->c_r - 0.5L * prev_a;
+		next_b = 2 * a * b + set->c_i - 0.5L * prev_b;
 		prev_a = a;
 		prev_b = b;
 		a = next_a;
 		b = next_b;
 		n++;
-		/* Above radius 2, growth relative to the previous step guarantees escape. */
-		if (a * a + b * b > set->esc
-			&& a * a + b * b >= prev_a * prev_a + prev_b * prev_b)
+		norm = a * a + b * b;
+		/* With |prev| <= |z|, the next magnitude is at least |z|² - 0.5|z| - |c|. */
+		if (norm > set->esc && norm >= prev_a * prev_a + prev_b * prev_b
+			&& (constant_bound <= 1 || isinf(norm)
+				|| norm - 1.5L * sqrtl(norm) > constant_bound))
 			return (ft_colorize_pixel(set, a, b, n, true));
 	}
 	return (ft_colorize_pixel(set, a, b, n, false));

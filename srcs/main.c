@@ -27,10 +27,38 @@ static void	ft_fractol_manager(t_set *set, t_data *img)
     ft_iterator(set, build[set->fractal], img);
 }
 
+static void	ft_update_palette_title(const t_set *set)
+{
+	static const char	*interpolation[] = {"sRGB", "Linear light", "Oklab"};
+	const char			*name;
+	char					title[160];
+
+	name = ft_fractal_titles(set->fractal);
+	if (set->color_mode != 1 || set->fractal == NEWTON)
+		SDL_snprintf(title, sizeof(title), "%s", name);
+	else if (set->fractal == BUDDHABROT)
+		SDL_snprintf(title, sizeof(title), "%s | Palette %d | %s", name,
+			set->color_scheme + 1, interpolation[set->palette_interpolation]);
+	else if (set->palette_single_color)
+		SDL_snprintf(title, sizeof(title),
+			"%s | Palette %d, color %d | %d iterations/step | %s", name,
+			set->color_scheme + 1, set->palette_anchor + 1, set->palette_span,
+			interpolation[set->palette_interpolation]);
+	else
+		SDL_snprintf(title, sizeof(title),
+			"%s | Palette %d | %d iterations/step | %s", name,
+			set->color_scheme + 1, set->palette_span,
+			interpolation[set->palette_interpolation]);
+	if (SDL_strcmp(title, SDL_GetWindowTitle(set->window)) != 0)
+		SDL_SetWindowTitle(set->window, title);
+}
+
 static void	ft_render(t_set *set)
 {
 	t_data	img;
 
+	if (set->status || set->buddhabrot_recolor)
+		ft_update_palette_title(set);
 	if (set->status || set->buddhabrot_recolor || ft_buddhabrot_pending(set))
 	{
 		if (!SDL_LockTexture(set->texture, NULL, &img.addr, &img.pitch))

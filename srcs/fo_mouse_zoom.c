@@ -20,6 +20,12 @@ void	ft_reset_viewer(t_set *set)
 	set->viewer->y_zero = set->screen_h / 2.0;
 	set->viewer->x_width = 5.1;
 	set->viewer->y_height = 3;
+	if (set->fractal == TRICORN)
+	{
+		set->tricorn_julia = false;
+		set->viewer->x_width = DEFAULT_VIEW_WIDTH;
+		set->viewer->y_height = DEFAULT_VIEW_HEIGHT;
+	}
 }
 
 inline static void	ft_zoom_in(t_set *set, int x_pointer, int y_pointer)
@@ -76,8 +82,11 @@ void	ft_mouse_zoom(t_set *set, float scroll, int x, int y)
 void	ft_mouse_select(t_set *set, int x, int y)
 {
 	if (set->fractal != JULIA && set->fractal != JULIA3
-		&& set->fractal != JULIA7)
+		&& set->fractal != JULIA7 && set->fractal != PHOENIX
+		&& set->fractal != TRICORN)
 		return;
+	if (set->fractal == TRICORN)
+		set->tricorn_julia = true;
 	set->c_r = (x - set->viewer->x_zero)
 		* (set->viewer->x_width / set->screen_w);
 	set->c_i = (y - set->viewer->y_zero)
