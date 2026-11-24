@@ -88,6 +88,7 @@ typedef struct s_set
 	t_buddhabrot_pixel	buddhabrot_color_peaks;
 	Uint64			buddhabrot_peak;
 	bool				buddhabrot_recolor;
+	bool				buddhabrot_original_exposure;
 	unsigned int	buddhabrot_samples;
 	unsigned int	buddhabrot_sample_limit;
 	Uint64			buddhabrot_rng;

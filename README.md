@@ -54,7 +54,9 @@ The window and fractal texture use the same logical dimensions.
   restarting sampling. Each palette has a gradient for each orbit range.
   In the default RGB palette, blue represents escape in 1–8 steps,
   green in 9–24 steps, and red in 25 or more. Each range uses its own
-  logarithmic scale. Changing the view or the iteration and
+  logarithmic scale. A brightness curve dims sparse visits by default.
+  Press **S** to compare with the original logarithmic exposure without
+  restarting sampling. Changing the view or the iteration and
   escape settings restarts sampling. The initial view uses 1,048,576
   samples from the same region around the Mandelbrot set. The sample
   budget increases in proportion to the inverse of the visible area,

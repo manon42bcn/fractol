@@ -52,6 +52,12 @@ inline static void	ft_keys_iteration(SDL_Keycode key, t_set *set)
 
 void	ft_keys_handler(SDL_Keycode key, t_set *set)
 {
+	if (set->fractal == BUDDHABROT && key == SDLK_S)
+	{
+		set->buddhabrot_original_exposure = !set->buddhabrot_original_exposure;
+		set->buddhabrot_recolor = true;
+		return;
+	}
 	if (set->fractal == BUDDHABROT && key == SDLK_SPACE)
 	{
 		if (set->color_mode == 1)

@@ -178,11 +178,16 @@ static float	ft_density_scale(Uint64 peak)
 	return (255.0f / log1pf((float)peak / BUDDHABROT_VISIT_WEIGHT));
 }
 
-static int	ft_density_level(Uint64 count, float scale)
+static int	ft_density_level(Uint64 count, float scale, bool original_exposure)
 {
+	float	level;
+
 	if (count == 0)
 		return (0);
-	return ((int)fminf(255, log1pf((float)count / BUDDHABROT_VISIT_WEIGHT) * scale));
+	level = fminf(255, log1pf((float)count / BUDDHABROT_VISIT_WEIGHT) * scale);
+	if (!original_exposure)
+		level *= sqrtf(level / 255.0f);
+	return ((int)level);
 }
 
 static Uint32	ft_gradient_rgb(Uint32 start, Uint32 end, int step, int span)
@@ -277,12 +282,16 @@ static void	ft_buddhabrot_draw(const t_set *set, t_data *img)
 			pixel = &set->buddhabrot_counts[(size_t)y * set->screen_w + x];
 			if (set->color_mode == 1)
 				color = ft_nebulabrot_mix(
-						gradients[0][ft_density_level(pixel->visits[0], scale[0])],
-						gradients[1][ft_density_level(pixel->visits[1], scale[1])],
-						gradients[2][ft_density_level(pixel->visits[2], scale[2])]);
+						gradients[0][ft_density_level(pixel->visits[0], scale[0],
+						set->buddhabrot_original_exposure)],
+						gradients[1][ft_density_level(pixel->visits[1], scale[1],
+						set->buddhabrot_original_exposure)],
+						gradients[2][ft_density_level(pixel->visits[2], scale[2],
+						set->buddhabrot_original_exposure)]);
 			else
 			{
-				level = ft_density_level(ft_buddhabrot_total(pixel), scale[0]);
+				level = ft_density_level(ft_buddhabrot_total(pixel), scale[0],
+						set->buddhabrot_original_exposure);
 				color = create_trgb(0, level, level, level);
 			}
 			ft_put_pixel(img, x, y, color);

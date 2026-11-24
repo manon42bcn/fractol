@@ -69,6 +69,7 @@ void	ft_help(void)
 	ft_putendl_fd("SPACE BAR: change color scheme.", 1);
 	ft_putendl_fd("Buddhabrot: C shows orbit colors, B shows density in grayscale.", 1);
 	ft_putendl_fd("Nebulabrot: SPACE BAR cycles palettes without restarting sampling.", 1);
+	ft_putendl_fd("Buddhabrot: S toggles shadow suppression.", 1);
 	ft_putendl_fd("ESC: exit fract-ol.", 1);
 	exit(0);
 }
