@@ -28,10 +28,32 @@ int	ft_mandelbrot_test(t_set *set)
 		b = 2 * a * b + set->zi;
 		a = t_a;
 		if (a * a + b * b > set->esc)
-			return (ft_colorize_pixel(set, a, b, n));
+			return (ft_colorize_pixel(set, a, b, n, true));
 		n++;
 	}
-	return (ft_colorize_pixel(set, a, b, n));
+	return (ft_colorize_pixel(set, a, b, n, false));
+}
+
+int	ft_tricorn_test(t_set *set)
+{
+	int				n;
+	long double	a;
+	long double	b;
+	long double	next_a;
+
+	n = 1;
+	a = 0;
+	b = 0;
+	while (n < set->max_i)
+	{
+		next_a = a * a - b * b + set->zr;
+		b = -2 * a * b + set->zi;
+		a = next_a;
+		if (a * a + b * b > set->esc)
+			return (ft_colorize_pixel(set, a, b, n, true));
+		n++;
+	}
+	return (ft_colorize_pixel(set, a, b, n, false));
 }
 
 int	ft_julia_test(t_set *set)
@@ -50,12 +72,12 @@ int	ft_julia_test(t_set *set)
 		b = 2.0 * a * b + set->c_r;
 		a = t_a;
 		if (a * a + b * b > set->esc)
-			return (ft_colorize_pixel(set, a, b, n));
+			return (ft_colorize_pixel(set, a, b, n, true));
 		if (t_a == b)
 			n = set->max_i - 1;
 		n++;
 	}
-	return (ft_colorize_pixel(set, a, b, n));
+	return (ft_colorize_pixel(set, a, b, n, false));
 }
 
 int	ft_burningship_test(t_set *set)
@@ -78,10 +100,10 @@ int	ft_burningship_test(t_set *set)
 		b += set->zi;
 		a = t_a;
 		if (a * a + b * b > set->esc)
-			return (ft_colorize_pixel(set, a, b, n));
+			return (ft_colorize_pixel(set, a, b, n, true));
 		n++;
 	}
-	return (ft_colorize_pixel(set, a, b, n));
+	return (ft_colorize_pixel(set, a, b, n, false));
 }
 
 int	ft_drop_test(t_set *set)
@@ -102,10 +124,10 @@ int	ft_drop_test(t_set *set)
 		b = 2.0 * a * b + set->zi;
 		a = t_a;
 		if (a * a + b * b > set->esc)
-			return (ft_colorize_pixel(set, a, b, n));
+			return (ft_colorize_pixel(set, a, b, n, true));
 		n++;
 	}
-	return (ft_colorize_pixel(set, a, b, n));
+	return (ft_colorize_pixel(set, a, b, n, false));
 }
 
 int	ft_bird_test(t_set *set)
@@ -124,8 +146,8 @@ int	ft_bird_test(t_set *set)
 		b = 1.0f / 2.0 * a * b + set->zi;
 		a = t_a;
 		if (a * a - b * b > set->esc)
-			return (ft_colorize_pixel(set, a, b, n));
+			return (ft_colorize_pixel(set, a, b, n, true));
 		n++;
 	}
-	return (ft_colorize_pixel(set, a, b, n));
+	return (ft_colorize_pixel(set, a, b, n, false));
 }

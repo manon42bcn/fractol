@@ -19,7 +19,7 @@ int	ft_fractal_dir(char *s)
 		"drop", "bird", "spider",
 		"worm", "hiper","mandelbrot3",
         "mandelbrot7", "julia3","julia7",
-        "drop7", NULL};
+        "drop7", "tricorn", "newton", "phoenix", "buddhabrot", NULL};
 	int i;
 
     i = 0;
@@ -42,7 +42,9 @@ char *ft_fractal_titles(int index)
 			"fract-ol - worm set", "fract-ol - hiper set",
 			"fract-ol - mandelbrot3 set", "fract-ol - mandelbrot7 set",
 			"fract-ol - julia3 set", "fract-ol - julia7 set",
-			"fract-ol - drop7 set", NULL};
+			"fract-ol - drop7 set", "fract-ol - tricorn set",
+			"fract-ol - newton set", "fract-ol - phoenix set",
+			"fract-ol - buddhabrot", NULL};
 
 	return (fractals[index]);
 }

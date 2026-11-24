@@ -12,9 +12,19 @@
 
 #include "fractol.h"
 
+static Uint32	ft_color_byte(int value)
+{
+	if (value < 0)
+		return (0);
+	if (value > 255)
+		return (255);
+	return ((Uint32)value);
+}
+
 int	create_trgb(int t, int r, int g, int b)
 {
-	return ((Uint32)t << 24 | (Uint32)r << 16 | (Uint32)g << 8 | (Uint32)b);
+	return (ft_color_byte(t) << 24 | ft_color_byte(r) << 16
+		| ft_color_byte(g) << 8 | ft_color_byte(b));
 }
 
 void	ft_put_pixel(t_data *data, int x, int y, int color)

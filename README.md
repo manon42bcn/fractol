@@ -39,3 +39,24 @@ make
 ```
 
 The window and fractal texture use the same logical dimensions.
+
+## Additional fractals
+
+- `./fractol newton` shows the three basins of attraction for the roots of
+  z³ − 1. Hue identifies the root and brightness shows how quickly the
+  point converged. Points without convergence are black.
+- `./fractol phoenix color` renders the Julia-style Phoenix with
+  c = 0.5667 and p = −0.5.
+- `./fractol buddhabrot` progressively plots the density of escaping
+  Mandelbrot orbits in grayscale. Start with `./fractol buddhabrot color`
+  for Nebulabrot, or press **C** for color and **B** for grayscale.
+  Press **Space** in color mode to cycle through four palettes without
+  restarting sampling. Each palette has a gradient for each orbit range.
+  In the default RGB palette, blue represents escape in 1–8 steps,
+  green in 9–24 steps, and red in 25 or more. Each range uses its own
+  logarithmic scale. Changing the view or the iteration and
+  escape settings restarts sampling. The initial view uses 1,048,576
+  samples from the same region around the Mandelbrot set. The sample
+  budget increases in proportion to the inverse of the visible area,
+  up to 16,777,216 samples per view. A bilinear filter spreads each
+  visit across neighboring pixel centers before applying the colors.

@@ -21,7 +21,8 @@ static void	ft_fractol_manager(t_set *set, t_data *img)
 						  &ft_worm_test, &ft_hiper_test,
 						  &ft_mandelbrot_test3, &ft_mandelbrot_test7,
 						  &ft_julia_test3, &ft_julia_test7,
-						  &ft_drop_test7, NULL};
+						  &ft_drop_test7, &ft_tricorn_test,
+						  &ft_newton_test, &ft_phoenix_test, NULL};
 
     ft_iterator(set, build[set->fractal], img);
 }
@@ -30,11 +31,14 @@ static void	ft_render(t_set *set)
 {
 	t_data	img;
 
-	if (set->status)
+	if (set->status || set->buddhabrot_recolor || ft_buddhabrot_pending(set))
 	{
 		if (!SDL_LockTexture(set->texture, NULL, &img.addr, &img.pitch))
 			ft_alloc_error(set, 2);
-		ft_fractol_manager(set, &img);
+		if (set->fractal == BUDDHABROT)
+			ft_buddhabrot_render(set, &img);
+		else
+			ft_fractol_manager(set, &img);
 		SDL_UnlockTexture(set->texture);
 		set->status = 0;
 	}
@@ -101,8 +105,18 @@ static void	ft_run(t_set *set)
 	bool		redraw;
 
 	ft_render(set);
-	while (SDL_WaitEvent(&event))
+	while (true)
 	{
+		if (ft_buddhabrot_pending(set))
+		{
+			if (!SDL_WaitEventTimeout(&event, 16))
+			{
+				ft_render(set);
+				continue;
+			}
+		}
+		else if (!SDL_WaitEvent(&event))
+			ft_alloc_error(set, 1);
 		redraw = false;
 		do
 		{
@@ -115,10 +129,10 @@ static void	ft_run(t_set *set)
 				|| event.type == SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED)
 				redraw = true;
 		} while (SDL_PollEvent(&event));
-		if (redraw || set->status)
+		if (redraw || set->status || set->buddhabrot_recolor
+			|| ft_buddhabrot_pending(set))
 			ft_render(set);
 	}
-	ft_alloc_error(set, 1);
 }
 
 int	main(int argc, char *argv[])

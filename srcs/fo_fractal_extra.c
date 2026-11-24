@@ -28,10 +28,10 @@ int	ft_mandelbrot_test3(t_set *set)
 		b = (3 * (a * a) * b - b * b * b) + set->zi;
 		a = t_a;
 		if (a * a + b * b > set->esc)
-			return (ft_colorize_pixel(set, a, b, n));
+			return (ft_colorize_pixel(set, a, b, n, true));
 		n++;
 	}
-	return (ft_colorize_pixel(set, a, b, n));
+	return (ft_colorize_pixel(set, a, b, n, false));
 }
 
 int	ft_mandelbrot_test7(t_set *set)
@@ -50,10 +50,10 @@ int	ft_mandelbrot_test7(t_set *set)
 		b = 2 * a * b + set->zi;
 		a = t_a;
 		if (a * a + b * b > set->esc)
-			return (ft_colorize_pixel(set, a, b, n));
+			return (ft_colorize_pixel(set, a, b, n, true));
 		n++;
 	}
-	return (ft_colorize_pixel(set, a, b, n));
+	return (ft_colorize_pixel(set, a, b, n, false));
 }
 
 int	ft_julia_test3(t_set *set)
@@ -72,12 +72,12 @@ int	ft_julia_test3(t_set *set)
 		b = (3.0 * (a * a) * b - b * b * b) + set->c_r;
 		a = t_a;
 		if (a * a + b * b > set->esc)
-			return (ft_colorize_pixel(set, a, b, n));
+			return (ft_colorize_pixel(set, a, b, n, true));
 		if (t_a == b)
 			n = set->max_i - 1;
 		n++;
 	}
-	return (ft_colorize_pixel(set, a, b, n));
+	return (ft_colorize_pixel(set, a, b, n, false));
 }
 
 int	ft_julia_test7(t_set *set)
@@ -100,12 +100,12 @@ int	ft_julia_test7(t_set *set)
 			- (b * b * b * b * b * b * b) + set->c_r;
 		a = t_a;
 		if (a * a + b * b > set->esc)
-			return (ft_colorize_pixel(set, a, b, n));
+			return (ft_colorize_pixel(set, a, b, n, true));
 		if (t_a == b)
 			n = set->max_i - 1;
 		n++;
 	}
-	return (ft_colorize_pixel(set, a, b, n));
+	return (ft_colorize_pixel(set, a, b, n, false));
 }
 
 int	ft_drop_test7(t_set *set)
@@ -130,8 +130,40 @@ int	ft_drop_test7(t_set *set)
 			- (b * b * b * b * b * b * b) + set->zi;
 		a = t_a;
 		if (a * a + b * b > set->esc)
-			return (ft_colorize_pixel(set, a, b, n));
+			return (ft_colorize_pixel(set, a, b, n, true));
 		n++;
 	}
-	return (ft_colorize_pixel(set, a, b, n));
+	return (ft_colorize_pixel(set, a, b, n, false));
+}
+
+int	ft_phoenix_test(t_set *set)
+{
+	long double	a;
+	long double	b;
+	long double	prev_a;
+	long double	prev_b;
+	long double	next_a;
+	long double	next_b;
+	int			n;
+
+	a = set->zr;
+	b = set->zi;
+	prev_a = 0;
+	prev_b = 0;
+	n = 0;
+	while (n < set->max_i)
+	{
+		next_a = a * a - b * b + 0.5667L - 0.5L * prev_a;
+		next_b = 2 * a * b - 0.5L * prev_b;
+		prev_a = a;
+		prev_b = b;
+		a = next_a;
+		b = next_b;
+		n++;
+		/* Above radius 2, growth relative to the previous step guarantees escape. */
+		if (a * a + b * b > set->esc
+			&& a * a + b * b >= prev_a * prev_a + prev_b * prev_b)
+			return (ft_colorize_pixel(set, a, b, n, true));
+	}
+	return (ft_colorize_pixel(set, a, b, n, false));
 }

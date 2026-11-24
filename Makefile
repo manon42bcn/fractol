@@ -17,6 +17,8 @@ SRCS_FILES		=	fo_colorize.c \
 					fo_fractal_dir.c \
 					fo_fractal_tests.c \
 					fo_fractal_extra.c \
+					fo_newton.c \
+					fo_buddhabrot.c \
 					fo_fractal_utils.c \
 					fo_handlers.c \
 					fo_input_utils.c \

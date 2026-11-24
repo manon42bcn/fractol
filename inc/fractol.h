@@ -20,6 +20,10 @@
 # include "libft.h"
 
 # define NO_FRACTAL     -1
+# define MAX_ITERATIONS 1000
+# define COLOR_SCHEME_COUNT 6
+# define DEFAULT_VIEW_WIDTH 4.8f
+# define DEFAULT_VIEW_HEIGHT 3.0f
 
 enum e_fractal_dir {
     MALDELBROT = 0,
@@ -34,7 +38,11 @@ enum e_fractal_dir {
     MANDELBROT7 = 9,
     JULIA3 = 10,
     JULIA7 = 11,
-    DROP7 = 12
+    DROP7 = 12,
+    TRICORN = 13,
+    NEWTON,
+    PHOENIX,
+    BUDDHABROT
 };
 
 typedef struct s_data {
@@ -50,6 +58,11 @@ typedef struct s_viewer
 	long double	x_width;
 	long double	y_height;
 }	t_viewer;
+
+typedef struct s_buddhabrot_pixel
+{
+	Uint64	visits[3];
+}	t_buddhabrot_pixel;
 
 typedef struct s_set
 {
@@ -71,6 +84,13 @@ typedef struct s_set
 	long double		c_i;
 	int				color;
 	int				status;
+	t_buddhabrot_pixel	*buddhabrot_counts;
+	t_buddhabrot_pixel	buddhabrot_color_peaks;
+	Uint64			buddhabrot_peak;
+	bool				buddhabrot_recolor;
+	unsigned int	buddhabrot_samples;
+	unsigned int	buddhabrot_sample_limit;
+	Uint64			buddhabrot_rng;
 }	t_set;
 
 typedef int (*t_builders)(t_set *set);
@@ -78,6 +98,12 @@ typedef int (*t_builders)(t_set *set);
 int         ft_fractal_dir(char *s);
 char        *ft_fractal_titles(int index);
 int			ft_mandelbrot_test(t_set *set);
+int			ft_tricorn_test(t_set *set);
+int			ft_newton_test(t_set *set);
+int			ft_phoenix_test(t_set *set);
+bool		ft_buddhabrot_pending(const t_set *set);
+void		ft_buddhabrot_render(t_set *set, t_data *img);
+void		ft_nebulabrot_next_palette(t_set *set);
 int			ft_julia_test(t_set *set);
 int			ft_burningship_test(t_set *set);
 int			ft_drop_test(t_set *set);
@@ -91,7 +117,7 @@ int	        ft_julia_test3(t_set *set);
 int	        ft_julia_test7(t_set *set);
 int	        ft_drop_test7(t_set *set);
 void		ft_iterator(t_set *set, int (f)(t_set *), t_data *img);
-int			ft_colorize_pixel(t_set *set, long double a, long double b, int n);
+int			ft_colorize_pixel(t_set *set, long double a, long double b, int n, bool escaped);
 int			ft_load_base_color(t_set *set);
 void		ft_keys_handler(SDL_Keycode key, t_set *set);
 t_set		*ft_init_fractol(int argc, char *argv[]);

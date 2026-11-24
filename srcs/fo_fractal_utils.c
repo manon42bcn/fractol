@@ -14,11 +14,6 @@
 
 int	ft_load_base_color(t_set *set)
 {
-	static int	base = 0;
-
-	if (base == 5)
-		base = 0;
-	set->color_scheme = base;
-	base++;
+	set->color_scheme = (set->color_scheme + 1) % COLOR_SCHEME_COUNT;
 	return (0);
 }

@@ -21,6 +21,8 @@ void	ft_alloc_error(t_set *set, int error)
 		fprintf(stderr, "SDL3: %s\n", SDL_GetError());
 	else if (error == 3)
 		ft_putendl_fd("\x1b[31m\e[1mError: allocating viewer.\e[0m", 1);
+	else if (error == 4)
+		ft_putendl_fd("Error: allocating Buddhabrot histogram.", 2);
 	ft_free_all(set);
 	exit(EXIT_FAILURE);
 }
@@ -45,7 +47,8 @@ void	ft_help(void)
 	ft_putendl_fd("\x1b[35m------------------------------------------", 1);
 	ft_putendl_fd("\e[1m\e[34mHELP - OPTIONS\x1b[0m", 1);
 	ft_putstr_fd("\e[44m[fractal]\e[0m\e[49m: mandelbrot, julia, ", 1);
-	ft_putendl_fd(" burningship, drop, bird, worm, spider, hiper.", 1);
+	ft_putendl_fd(" burningship, drop, bird, worm, spider, hiper, tricorn,", 1);
+	ft_putendl_fd(" newton, phoenix, buddhabrot.", 1);
 	ft_putendl_fd("\e[44m[options]\e[0m\e[49m: color, mono, bw, full.", 1);
 	ft_putendl_fd("\e[44m[params] (julia set only)\e[0m\e[49m: ", 1);
 	ft_putendl_fd("write two constant values for julia set.	", 1);
@@ -64,6 +67,8 @@ void	ft_help(void)
 	ft_putendl_fd("B: swich to black and white.", 1);
 	ft_putendl_fd("F: swich to full mode (laggy, but interesting).", 1);
 	ft_putendl_fd("SPACE BAR: change color scheme.", 1);
+	ft_putendl_fd("Buddhabrot: C shows orbit colors, B shows density in grayscale.", 1);
+	ft_putendl_fd("Nebulabrot: SPACE BAR cycles palettes without restarting sampling.", 1);
 	ft_putendl_fd("ESC: exit fract-ol.", 1);
 	exit(0);
 }

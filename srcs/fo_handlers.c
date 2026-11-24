@@ -40,7 +40,7 @@ inline static void	ft_keys_iteration(SDL_Keycode key, t_set *set)
 {
 	if (key == SDLK_EQUALS || key == SDLK_PLUS || key == SDLK_KP_PLUS)
 	{
-		if (set->max_i + 10 <= 1000)
+		if (set->max_i + 10 <= MAX_ITERATIONS)
 			set->max_i += 10;
 	}
 	else if (key == SDLK_MINUS || key == SDLK_KP_MINUS)
@@ -52,6 +52,24 @@ inline static void	ft_keys_iteration(SDL_Keycode key, t_set *set)
 
 void	ft_keys_handler(SDL_Keycode key, t_set *set)
 {
+	if (set->fractal == BUDDHABROT && key == SDLK_SPACE)
+	{
+		if (set->color_mode == 1)
+			ft_nebulabrot_next_palette(set);
+		return;
+	}
+	if (set->fractal == BUDDHABROT && (key == SDLK_C || key == SDLK_B))
+	{
+		ft_keys_color_mode(key, set);
+		set->buddhabrot_recolor = true;
+		return;
+	}
+	if ((set->fractal == NEWTON || set->fractal == BUDDHABROT)
+		&& (key == SDLK_SPACE || key == SDLK_C || key == SDLK_M
+			|| key == SDLK_B || key == SDLK_F))
+		return;
+	if (set->fractal == NEWTON && (key == SDLK_I || key == SDLK_O))
+		return;
 	if (key == SDLK_UP || key == SDLK_DOWN || key == SDLK_LEFT || key == SDLK_RIGHT)
 		ft_keys_panning_mode(key, set);
 	else if (key == SDLK_SPACE)

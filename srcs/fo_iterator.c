@@ -30,10 +30,10 @@ int	ft_hiper_test(t_set *set)
 		b = sin(b) * ((exp(a) + exp(-a)) / 2) + set->zi;
 		a = t_a;
 		if (a * a - b * b > set->esc)
-			return (ft_colorize_pixel(set, a, b, n));
+			return (ft_colorize_pixel(set, a, b, n, true));
 		n++;
 	}
-	return (ft_colorize_pixel(set, a, b, n));
+	return (ft_colorize_pixel(set, a, b, n, false));
 }
 
 int	ft_worm_test(t_set *set)
@@ -54,10 +54,10 @@ int	ft_worm_test(t_set *set)
 		b = exp(a) * sin(b) + set->zi;
 		a = t_a;
 		if (a * a - b * b > set->esc)
-			return (ft_colorize_pixel(set, a, b, n));
+			return (ft_colorize_pixel(set, a, b, n, true));
 		n++;
 	}
-	return (ft_colorize_pixel(set, a, b, n));
+	return (ft_colorize_pixel(set, a, b, n, false));
 }
 
 int	ft_spider_test(t_set *set)
@@ -78,10 +78,10 @@ int	ft_spider_test(t_set *set)
 		b = -sin(a) * ((exp(b) - exp(-b)) / 2) + set->zi;
 		a = t_a;
 		if (a * a - b * b > set->esc)
-			return (ft_colorize_pixel(set, a, b, n));
+			return (ft_colorize_pixel(set, a, b, n, true));
 		n++;
 	}
-	return (ft_colorize_pixel(set, a, b, n));
+	return (ft_colorize_pixel(set, a, b, n, false));
 }
 
 void	ft_iterator(t_set *set, int (f)(t_set *), t_data *img)
