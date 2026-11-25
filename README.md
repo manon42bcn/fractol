@@ -62,6 +62,7 @@ its default view. Start with `./fractol color` for color, or pass `mono`,
 | **+** / **−**, **I** / **O** | Raise or lower the iteration limit or squared escape threshold. |
 | **C**, **M**, **B**, **F** | Select color, tinted monochrome, black and white, or full mode where supported. |
 | **Space**, **L** | Cycle palettes or change interpolation in color mode. |
+| **D** | Toggle distance shading in Mandelbrot color mode. |
 | **J** / **K**, **P**, **N** | Shorten or lengthen classic palette transitions, toggle the single-color gradient, or choose another reference color. |
 | Right click | Pick a complex constant in Julia or Phoenix, or enter anti-Julia from Tricorn. Press **Q** to return to Tricorn. |
 | **Esc** | Close the explorer. |
@@ -159,14 +160,24 @@ Both controls preserve the accumulated histogram.
 
 Classic palettes convert escape counts to positions on a circular gradient.
 The default is eight iterations between reference colors. Mandelbrot, Julia,
-Tricorn, and Burning Ship use fractional escape counts for smoother
-transitions. Palette 2 runs from dark blue through turquoise to ivory
-and back to dark blue.
+Tricorn, Burning Ship, and the supported higher-degree polynomial maps
+use fractional escape counts for smoother transitions. The smoothing
+uses the degree of the recurrence where applicable.
+
+Palettes 2, 3, and 6 close their cycles with a gradual return to the
+starting tone. Palette 2 goes from dark blue through turquoise to ivory,
+palette 3 from graphite to silver, and palette 6 from dark copper through
+amber to cream.
 
 **L** cycles sRGB (the default), linear light, and [Oklab] interpolation.
 The window title shows the active palette, interpolation, and transition
 length when applicable. In Nebulabrot, changing interpolation recolors
 the current histogram.
+
+In Mandelbrot color mode, **D** toggles an optional exterior distance
+estimate based on the derivative of the orbit. The renderer uses it to
+darken colors near the boundary over a few fractions of a pixel. The
+window title indicates when distance shading is active.
 
 ## SDL3 rendering
 
@@ -190,7 +201,8 @@ whose precision varies by platform.
 
 After installing the build dependencies and initializing the submodules,
 run `make test`. It checks numerical orbits, poles, Newton basins,
-command-line startup, and circular keyboard navigation. It renders
+palette cycles, smoothing, distance shading, and keyboard navigation.
+It also checks command-line startup and renders
 every fractal with SDL's dummy video driver, checks that **Q** restores
 the small-offset view, and verifies that an unchanged build skips
 compilation and linking. GitHub Actions uses the same target on macOS.

@@ -59,6 +59,7 @@ static void	ft_help_colors(void)
 	ft_putendl_fd("Buddhabrot: S toggles shadow suppression.", 1);
 	ft_putendl_fd("L: cycle sRGB, linear-light and Oklab"
 		" interpolation in color mode.", 1);
+	ft_putendl_fd("D: toggle Mandelbrot distance shading in color mode.", 1);
 	ft_putendl_fd("Classic color palettes: J shortens"
 		" transitions, K lengthens them.", 1);
 	ft_putendl_fd("P switches between the full palette and one"
