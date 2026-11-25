@@ -195,7 +195,17 @@ every fractal with SDL's dummy video driver, checks that **Q** restores
 the small-offset view, and verifies that an unchanged build skips
 compilation and linking. GitHub Actions uses the same target on macOS.
 
-Run `norminette srcs inc tests` separately for the 42 style check.
+Run `norminette srcs inc tests` locally for the 42 style check. GitHub
+Actions includes it in the **Fractol CI** check.
+
+## Contributing
+
+Branch from `dev` and open a pull request back into `dev`. To promote
+the tested development branch, open a pull request from this repository's
+`dev` into `master`.
+
+Both protected branches require a pull request with a passing
+**Fractol CI** check. Only [@manon42bcn] can merge into them.
 
 [libft]: https://github.com/manon42bcn/libft
 [rgb]: https://github.com/manon42bcn/rgb
@@ -203,3 +213,4 @@ Run `norminette srcs inc tests` separately for the 42 style check.
 [SDL3 MinGW instructions]: https://github.com/libsdl-org/SDL/blob/main/docs/INTRO-mingw.md
 [SDL streaming texture API]: https://wiki.libsdl.org/SDL3/SDL_LockTexture
 [Oklab]: https://bottosson.github.io/posts/oklab/
+[@manon42bcn]: https://github.com/manon42bcn
