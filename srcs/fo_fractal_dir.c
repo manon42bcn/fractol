@@ -12,39 +12,32 @@
 
 #include "fractol.h"
 
-int	ft_fractal_dir(char *s)
+/**
+ * @brief Look up the window title for a fractal.
+ * @param[in] index Valid index in the fractal enumeration.
+ * @return Pointer to the stored window title.
+ */
+const char	*ft_fractal_titles(int index)
 {
-	static char	*fractals[] = {
-		"mandelbrot", "julia", "burningship",
-		"drop", "bird", "spider",
-		"worm", "hiper","mandelbrot3",
-        "mandelbrot7", "julia3","julia7",
-        "drop7", "tricorn", "newton", "phoenix", "buddhabrot", NULL};
-	int i;
-
-    i = 0;
-	while (fractals[i])
-	{
-
-		if (ft_strict_cmp(fractals[i], s) == 0)
-			return (i);
-		i++;
-	}
-	return (NO_FRACTAL);
-}
-
-char *ft_fractal_titles(int index)
-{
-	static char *fractals[] = {
-			"fract-ol - mandelbrot set", "fract-ol -  julia set",
-			"fract-ol - burningship set", "fract-ol - drop set",
-			"fract-ol - bird set", "fract-ol - spider set",
-			"fract-ol - worm set", "fract-ol - hiper set",
-			"fract-ol - mandelbrot3 set", "fract-ol - mandelbrot7 set",
-			"fract-ol - julia3 set", "fract-ol - julia7 set",
-			"fract-ol - drop7 set", "fract-ol - tricorn set",
-			"fract-ol - newton set", "fract-ol - phoenix set",
-			"fract-ol - buddhabrot", NULL};
+	static const char	*fractals[] = {
+		"fract-ol - mandelbrot set", "fract-ol -  julia set",
+		"fract-ol - burningship set", "fract-ol - drop set",
+		"fract-ol - bird set", "fract-ol - spider set",
+		"fract-ol - worm set", "fract-ol - hiper set",
+		"fract-ol - mandelbrot3 set", "fract-ol - mandelbrot7 set",
+		"fract-ol - julia3 set", "fract-ol - julia7 set",
+		"fract-ol - drop7 set", "fract-ol - tricorn set",
+		"fract-ol - newton set", "fract-ol - phoenix set",
+		"fract-ol - buddhabrot", "fract-ol - cos(c/z)",
+		"fract-ol - cos(z/c)", "fract-ol - sin(z/sqrt(c))",
+		"fract-ol - rational quadratic", "fract-ol - z^2 + z + c",
+		"fract-ol - (1 + z) / z^2 + c", "fract-ol - z^-2 + c",
+		"fract-ol - z^-5 + c", "fract-ol - z^2 + c / (z^2 + 0.1)",
+		"fract-ol - z^2 + c / (z^2 + 0.001)",
+		"fract-ol - ((z^2 + c - 1) / (2z + c - 2))^2",
+		"fract-ol - z^4 + c", "fract-ol - z^3 - z + c",
+		"fract-ol - z^2 + c + c^2", NULL
+	};
 
 	return (fractals[index]);
 }

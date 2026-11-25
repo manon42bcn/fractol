@@ -1,89 +1,202 @@
-/* ************************************************ */
-/*                                                  */
-/*                              :::      ::::::::   */
-/*                            :+:      :+:    :+:   */
-/*                          +:+ +:+         +:+     */
-/*                        +#+  +:+       +#+        */
-/*                      +#+#+#+#+#+   +#+           */
-/*                           #+#    #+#             */
-/*                          ###   ########.fr       */
-/* MPORRAS- 42Barcelona                             */
-/* ************************************************ */
-=================
-FRACTOL.
-=================
+# Fractol
 
-Fractol - 42 project.
+Fractol is an interactive fractal explorer written in C for the 42 Barcelona
+project. It draws escape-time fractals, Newton basins, and orbit-density images
+with SDL3. The original project received a score of 125%.
 
-Run ./fractol --help to further instructions.
+## Installation
 
-Score 125%.
+You need Git, a C compiler, Make, pkg-config (or pkgconf), and the
+**SDL3 development files, version 3.2.0 or later**.
 
-Don't copy without understand!
-Be honest with yourself.
+1. Clone the project and initialize its dependencies.
 
-## Building with SDL3
+   ```sh
+   git clone https://github.com/manon42bcn/fractol.git
+   cd fractol
+   make submodules
+   ```
 
-Install the SDL3 development files (3.2.0 or newer), a C compiler,
-Make and pkg-config. On macOS, SDL3 is available through Homebrew
-with `make install-sdl`, which installs SDL3 and pkgconf and checks
-the detected SDL3 version. On Linux, Windows and other systems, the rule
-prints manual installation instructions for the detected platform.
+   The build uses the [libft] and [rgb] submodules in `lib/` and `rgb/`.
+   Their configured URLs use GitHub SSH. To fetch the public submodules over
+   HTTPS, run the following command in place of `make submodules`:
 
-Run `make check-sdl` to verify that pkg-config can find SDL3 and print
-the installed version without building Fractol.
+   ```sh
+   git -c url.https://github.com/.insteadOf=git@github.com: submodule update --init --recursive
+   ```
 
-```sh
-make
-./fractol mandelbrot
-```
+2. Install SDL3 for your platform.
 
-The window and fractal texture use the same logical dimensions.
+   - **macOS.** With Homebrew installed, run `make install-sdl` to install
+     SDL3 and pkgconf.
+   - **Linux.** Install your distribution's SDL3 development package and
+     pkg-config. The [SDL3 Linux instructions] cover building SDL3 from source.
+   - **Windows.** In an MSYS2 UCRT64 shell with a C toolchain and Make,
+     install `mingw-w64-ucrt-x86_64-sdl3` and `mingw-w64-ucrt-x86_64-pkgconf`.
+     See the [SDL3 MinGW instructions].
 
-## Additional fractals
+3. Check the dependency, build, and start the explorer.
 
-- `./fractol tricorn color` opens the Tricorn. Right-click to see the
-  anti-Julia set for the complex coordinate under the cursor. Right-click
-  again to choose another constant, or press **Q** to return to the Tricorn.
+   ```sh
+   make check-sdl
+   make
+   ./fractol
+   ```
 
-- `./fractol newton` shows the three basins of attraction for the roots of
-  z³ − 1. Hue identifies the root and brightness shows how quickly the
-  point converged. Points without convergence are black.
-- `./fractol phoenix color` renders the Julia-style Phoenix with
-  c = 0.5667 and p = −0.5. Right-click to use the cursor's complex
-  coordinates as the new value of c.
-- `./fractol buddhabrot` progressively plots the density of escaping
-  Mandelbrot orbits in grayscale. Start with `./fractol buddhabrot color`
-  for Nebulabrot, or press **C** for color and **B** for grayscale.
-  Press **Space** in color mode to cycle through four palettes without
-  restarting sampling. Each palette has a gradient for each orbit range.
-  In the default RGB palette, blue represents escape in 1–8 steps,
-  green in 9–24 steps, and red in 25 or more. Each range uses its own
-  logarithmic scale. A brightness curve dims sparse visits by default.
-  Press **S** to compare with the original logarithmic exposure without
-  restarting sampling. Changing the view or the iteration and
-  escape settings restarts sampling. The initial view uses 1,048,576
-  samples from the same region around the Mandelbrot set. The sample
-  budget increases in proportion to the inverse of the visible area,
-  up to 16,777,216 samples per view. A bilinear filter spreads each
-  visit across neighboring pixel centers before applying the colors.
+The [Makefile](Makefile) uses pkg-config to find SDL3. It builds and links
+the static libraries `libft.a` and `librgb.a` from the submodules.
 
-### Experimental palette interpolation
+## Controls
 
-Press **L** in `color` mode to cycle through sRGB (the default),
-linear-light, and [Oklab](https://bottosson.github.io/posts/oklab/)
-interpolation. This applies to the classic palettes and to the
-Nebulabrot gradients. In Nebulabrot you can switch while
-keeping the accumulated samples.
+Fractol opens in Mandelbrot. Use **Tab** and **Shift+Tab** to move through the
+fractal list in either direction. The list wraps and each fractal opens at
+its default view. Start with `./fractol color` for color, or pass `mono`,
+`bw`, or `full`. The default is `bw`. Run `./fractol --help` for the controls.
 
-The RGB utilities in `rgb/` come from
-[manon42bcn/rgb](https://github.com/manon42bcn/rgb) at commit
-`fa9ade0a3edde5f5e5ee8737deaa3047272419c9`. Fractol adds
-`ft_rgb_lerp_linear` and `ft_rgb_lerp_oklab` to that copy.
+| Input | Action |
+| --- | --- |
+| Mouse wheel, arrow keys, **Q** | Zoom at the cursor, pan, or reset the view. |
+| **+** / **−**, **I** / **O** | Raise or lower the iteration limit or squared escape threshold. |
+| **C**, **M**, **B**, **F** | Select color, tinted monochrome, black and white, or full mode where supported. |
+| **Space**, **L** | Cycle palettes or change interpolation in color mode. |
+| **J** / **K**, **P**, **N** | Shorten or lengthen classic palette transitions, toggle the single-color gradient, or choose another reference color. |
+| Right click | Pick a complex constant in Julia or Phoenix, or enter anti-Julia from Tricorn. Press **Q** to return to Tricorn. |
+| **Esc** | Close the explorer. |
 
-For classic fractals in `color` mode, **J** shortens palette transitions
-and **K** lengthens them. The default is eight iterations between
-reference colors. **P** switches between the full palette and a
-black-to-white gradient through one reference color. In that mode,
-**N** picks another color from the current palette. The window title
-shows the palette, interpolation mode, and transition length.
+## How a fractal is calculated
+
+An orbit is the sequence of complex values obtained by applying a formula
+repeatedly. Nearby inputs can produce very different orbits. In a
+parameter-plane fractal such as Mandelbrot, each pixel supplies the
+parameter $c$. In a Julia-style fractal, the pixel supplies $z_0$ and a
+shared constant determines the image.
+
+Given the view origin $(x_0,y_0)$, complex extent $(w,h)$, and texture size
+$(W,H)$, [the pixel iterator](srcs/fo_iterator.c) maps a pixel $(x,y)$ to
+
+$$
+p = (x - x_0)\frac{w}{W} + i(y - y_0)\frac{h}{H}.
+$$
+
+The imaginary component increases down the screen. Zoom and pan change the
+view extent and origin. The initial iteration limit is 50. Most
+escape-time variants check the squared magnitude $|z|^2$ against an
+initial threshold of 4. Pixels whose orbits reach the iteration limit
+without meeting the escape condition are black. For the newer rational
+and trigonometric maps, this cutoff is a rendering rule, and division by
+zero and nonfinite iterates also count as escapes.
+
+Each per-pixel orbit function returns a `t_orbit_result` containing its final
+point, iteration count, and escape or convergence information.
+[The colorizer](srcs/fo_colorize.c) turns that result into a packed pixel
+color. Buddhabrot draws from a histogram of many orbits.
+
+### Escape-time formulas
+
+Mandelbrot uses $z_{n+1}=z_n^2+c$ with $z_0=0$. The quadratic and cubic
+Mandelbrot loops start with the first iterate $z_1=c$ already computed.
+For $z=a+bi$, the quadratic step uses the old values of both components:
+
+$$
+a' = a^2-b^2+\operatorname{Re}(c),\qquad
+b' = 2ab+\operatorname{Im}(c).
+$$
+
+Fractol uses explicit component arithmetic and C complex arithmetic.
+For example, the seventh-power Mandelbrot step evaluates the real and
+imaginary polynomials using $a^2$ and $b^2$. The fourth-power variant
+squares twice. In $z^2+c+c^2$, the term $c+c^2$ is computed once per pixel.
+[Seventh-power maps](srcs/fo_fractal_degree7.c) · [Polynomial variants](srcs/fo_fractal_polynomial.c)
+
+| Family | Recurrence and initial point |
+| --- | --- |
+| Mandelbrot powers | $z^m+c$ for $m=2,3,4,7$, from zero. |
+| Julia powers | $z^m+c$ for $m=2,3,7$, with the pixel as $z_0$. These variants add the selected constant's real and imaginary components in swapped order. |
+| Burning Ship | $(\lvert a\rvert+i\lvert b\rvert)^2+c$ for $z=a+bi$, with the loop initialized at $z=c$. |
+| Tricorn and anti-Julia | $\overline{z}^{\,2}+c$. Tricorn uses the pixel as $c$ and starts at zero. Anti-Julia uses the pixel as $z_0$ and the selected constant as $c$. |
+| Phoenix | $z_{n+1}=z_n^2+c-0.5z_{n-1}$, with the pixel as $z_0$, $z_{-1}=0$, and default $c=0.5667$. Its escape check accounts for the previous point. |
+| Polynomial variants | $z^2+z+c$, $z^3-z+c$, and $z^2+c+c^2$, all from zero. |
+| Rational quadratic | $z^2+c^2/(z^2+c)+c$, from zero. |
+| Rational reciprocal | $(1+z)/z^2+c$, starting at the finite critical point $z_0=-2$. |
+| Negative powers | $z^{-2}+c$ and $z^{-5}+c$, both from $z_0=1$. |
+| Rational offsets | $z^2+c/(z^2+k)$, with $k=0.1$ or $k=0.001$ and $z_0=0$. |
+| Rational square | $\left((z^2+c-1)/(2z+c-2)\right)^2$, from zero. |
+| Trigonometric ratios | $\cos(c/z)$, $\cos(z/c)$, and $\sin(z/\sqrt{c})$, all from $z_0=1$. The sine map uses the principal complex square root. |
+
+Drop and Drop7 apply quadratic and seventh-power iteration to an inverted
+pixel parameter. Bird, Spider, Worm, and Hiper have their own coordinate
+transforms and escape checks.
+[Shape variants](srcs/fo_fractal_shapes.c) · [Experimental maps](srcs/fo_iterator.c)
+
+The $k=0.001$ offset variant opens zoomed in around $c=0$ because its first
+step gives $z_1=1000c$. Press **Q** to return to that framing.
+
+### Newton and Buddhabrot
+
+**Newton** starts at the pixel coordinate and applies Newton's method to
+$f(z)=z^3-1$. Its step is $z_{n+1}=(2z_n+1/z_n^2)/3$.
+The converged root determines hue, and faster convergence gives a brighter
+pixel. Points without a converged root are black. [Newton iteration](srcs/fo_newton.c)
+
+**Buddhabrot** samples $c$ in a fixed region around Mandelbrot and iterates
+$z^2+c$ from zero. When an orbit escapes, the renderer projects its recorded
+points into a histogram and distributes visits among neighboring pixels
+using bilinear weights. It starts with a budget of 1,048,576 samples.
+Zooming in increases the budget with the inverse of the visible area, up
+to 16,777,216 samples per view. Changes to the view, iteration limit, or
+escape threshold restart sampling. [Sampler](srcs/fo_buddhabrot.c)
+
+In color mode, **Nebulabrot** groups escaping orbits by their escape step.
+The default palette uses blue for 1–8 steps, green for 9–24, and red for 25
+or more. Each band has its own logarithmic intensity scale. **Space** cycles
+four palettes and **S** toggles the brightness curve that dims sparse visits.
+Both controls preserve the accumulated histogram.
+
+### Color and palettes
+
+Classic palettes convert escape counts to positions on a circular gradient.
+The default is eight iterations between reference colors. Mandelbrot, Julia,
+Tricorn, and Burning Ship use fractional escape counts for smoother
+transitions. Palette 2 runs from dark blue through turquoise to ivory
+and back to dark blue.
+
+**L** cycles sRGB (the default), linear light, and [Oklab] interpolation.
+The window title shows the active palette, interpolation, and transition
+length when applicable. In Nebulabrot, changing interpolation recolors
+the current histogram.
+
+## SDL3 rendering
+
+[Video initialization](srcs/fo_video_init.c) creates the SDL window, renderer,
+and streaming ARGB8888 texture. Fractol calculates the pixels on the CPU.
+[The render loop](srcs/fo_video.c) locks the texture and writes each row using
+SDL's reported pitch. It then unlocks the texture, draws it with
+`SDL_RenderTexture`, and presents the frame. SDL3 also supplies keyboard,
+mouse, window, and renderer events. The loop reuses the current texture
+until a redraw is needed. Buddhabrot keeps requesting frames while
+sampling is in progress. [SDL streaming texture API]
+
+The window and texture use the same logical dimensions. Both are sized
+by dividing the primary display width and height by `FACTOR`, currently
+2 in the [Makefile](Makefile). A lower factor gives more pixels at the
+same complex extent and increases the work per redraw. Deep zoom also
+depends on numerical precision. Some calculations use `long double`,
+whose precision varies by platform.
+
+## Running tests
+
+After installing the build dependencies and initializing the submodules,
+run `make test`. It checks numerical orbits, poles, Newton basins,
+command-line startup, and circular keyboard navigation. It renders
+every fractal with SDL's dummy video driver, checks that **Q** restores
+the small-offset view, and verifies that an unchanged build skips
+compilation and linking. GitHub Actions uses the same target on macOS.
+
+Run `norminette srcs inc tests` separately for the 42 style check.
+
+[libft]: https://github.com/manon42bcn/libft
+[rgb]: https://github.com/manon42bcn/rgb
+[SDL3 Linux instructions]: https://wiki.libsdl.org/SDL3/README-linux
+[SDL3 MinGW instructions]: https://github.com/libsdl-org/SDL/blob/main/docs/INTRO-mingw.md
+[SDL streaming texture API]: https://wiki.libsdl.org/SDL3/SDL_LockTexture
+[Oklab]: https://bottosson.github.io/posts/oklab/

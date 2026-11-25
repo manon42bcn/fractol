@@ -12,18 +12,11 @@
 
 #include "fractol.h"
 
-inline static void	ft_keys_color_mode(SDL_Keycode key, t_set *set)
-{
-	if (key == SDLK_C)
-		set->color_mode = 1;
-	if (key == SDLK_M)
-		set->color_mode = 2;
-	if (key == SDLK_B)
-		set->color_mode = 3;
-	if (key == SDLK_F)
-		set->color_mode = 4;
-}
-
+/**
+ * @brief Pan the view by one keyboard step.
+ * @param[in] key SDL arrow key code.
+ * @param[in,out] set State containing the view origin.
+ */
 inline static void	ft_keys_panning_mode(SDL_Keycode key, t_set *set)
 {
 	if (key == SDLK_UP)
@@ -36,6 +29,11 @@ inline static void	ft_keys_panning_mode(SDL_Keycode key, t_set *set)
 		set->viewer->x_zero -= 50;
 }
 
+/**
+ * @brief Adjust the iteration limit within its supported range.
+ * @param[in] key SDL key code for increasing or decreasing the limit.
+ * @param[in,out] set State containing the iteration limit.
+ */
 inline static void	ft_keys_iteration(SDL_Keycode key, t_set *set)
 {
 	if (key == SDLK_EQUALS || key == SDLK_PLUS || key == SDLK_KP_PLUS)
@@ -50,69 +48,17 @@ inline static void	ft_keys_iteration(SDL_Keycode key, t_set *set)
 	}
 }
 
-static bool	ft_keys_palette(SDL_Keycode key, t_set *set)
-{
-	if (set->color_mode != 1 || set->fractal == NEWTON
-		|| set->fractal == BUDDHABROT)
-		return (false);
-	if (key == SDLK_J)
-		set->palette_span = SDL_max(MIN_PALETTE_SPAN, set->palette_span - 1);
-	else if (key == SDLK_K)
-		set->palette_span = SDL_min(MAX_PALETTE_SPAN, set->palette_span + 1);
-	else if (key == SDLK_P)
-		set->palette_single_color = !set->palette_single_color;
-	else if (key == SDLK_N && set->palette_single_color)
-		set->palette_anchor = (set->palette_anchor + 1) % PALETTE_COLOR_COUNT;
-	else
-		return (false);
-	return (true);
-}
-
+/**
+ * @brief Dispatch a released key to the applicable view or color control.
+ * @param[in] key SDL key code from the keyboard event.
+ * @param[in,out] set Fractal, view, color, and redraw settings.
+ */
 void	ft_keys_handler(SDL_Keycode key, t_set *set)
 {
-	if (key == SDLK_L && set->fractal != NEWTON)
-	{
-		set->palette_interpolation = (set->palette_interpolation + 1)
-			% PALETTE_INTERPOLATION_COUNT;
-		if (set->color_mode == 1)
-		{
-			if (set->fractal == BUDDHABROT)
-				set->buddhabrot_recolor = true;
-			else
-				set->status = 1;
-		}
-		return;
-	}
-	if (set->fractal == BUDDHABROT && key == SDLK_S)
-	{
-		set->buddhabrot_original_exposure = !set->buddhabrot_original_exposure;
-		set->buddhabrot_recolor = true;
-		return;
-	}
-	if (set->fractal == BUDDHABROT && key == SDLK_SPACE)
-	{
-		if (set->color_mode == 1)
-			ft_nebulabrot_next_palette(set);
-		return;
-	}
-	if (set->fractal == BUDDHABROT && (key == SDLK_C || key == SDLK_B))
-	{
-		ft_keys_color_mode(key, set);
-		set->buddhabrot_recolor = true;
-		return;
-	}
-	if ((set->fractal == NEWTON || set->fractal == BUDDHABROT)
-		&& (key == SDLK_SPACE || key == SDLK_C || key == SDLK_M
-			|| key == SDLK_B || key == SDLK_F))
-		return;
-	if (set->fractal == NEWTON && (key == SDLK_I || key == SDLK_O))
-		return;
-	if (ft_keys_palette(key, set))
-	{
-		set->status = 1;
-		return;
-	}
-	if (key == SDLK_UP || key == SDLK_DOWN || key == SDLK_LEFT || key == SDLK_RIGHT)
+	if (ft_keys_special(key, set))
+		return ;
+	if (key == SDLK_UP || key == SDLK_DOWN || key == SDLK_LEFT
+		|| key == SDLK_RIGHT)
 		ft_keys_panning_mode(key, set);
 	else if (key == SDLK_SPACE)
 		ft_load_base_color(set);
@@ -131,6 +77,6 @@ void	ft_keys_handler(SDL_Keycode key, t_set *set)
 			set->esc -= 5;
 	}
 	else
-		return;
+		return ;
 	set->status = 1;
 }

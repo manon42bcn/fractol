@@ -4,3 +4,6 @@
 [submodule "lib"]
 	path = lib
 	url = git@github.com:manon42bcn/libft.git
+[submodule "rgb"]
+	path = rgb
+	url = git@github.com:manon42bcn/rgb.git

@@ -12,79 +12,106 @@
 
 #include "fractol.h"
 
-int	ft_hiper_test(t_set *set)
+/**
+ * @brief Iterate the Hiper map using exponential and trigonometric terms.
+ * @param[in] set Pixel coordinates and orbit settings.
+ * @return Final orbit point, iteration count, and escape status.
+ */
+t_orbit_result	ft_hiper_test(const t_set *set)
 {
 	int			n;
 	long double	a;
 	long double	b;
 	long double	t_a;
+	t_coor		c;
 
 	n = 1;
 	a = set->zr / (set->zr * set->zr + set->zi * set->zi);
 	b = -set->zi / (set->zr * set->zr + set->zi * set->zi);
-	set->zr = a;
-	set->zi = b;
+	c = (t_coor){(double)a, (double)b};
 	while (n < set->max_i)
 	{
-		t_a = cos(b) * ((exp(a) - exp(-a)) / 2) + set->zr;
-		b = sin(b) * ((exp(a) + exp(-a)) / 2) + set->zi;
+		t_a = cos(b) * ((exp(a) - exp(-a)) / 2) + c.a;
+		b = sin(b) * ((exp(a) + exp(-a)) / 2) + c.b;
 		a = t_a;
 		if (a * a - b * b > set->esc)
-			return (ft_colorize_pixel(set, a, b, n, true));
+			return ((t_orbit_result){
+				.point = {a, b}, .n = n, .escaped = true});
 		n++;
 	}
-	return (ft_colorize_pixel(set, a, b, n, false));
+	return ((t_orbit_result){
+		.point = {a, b}, .n = n, .escaped = false});
 }
 
-int	ft_worm_test(t_set *set)
+/**
+ * @brief Iterate the Worm map using the complex exponential.
+ * @param[in] set Pixel coordinates and orbit settings.
+ * @return Final orbit point, iteration count, and escape status.
+ */
+t_orbit_result	ft_worm_test(const t_set *set)
 {
 	int			n;
 	long double	a;
 	long double	b;
 	long double	t_a;
+	t_coor		c;
 
 	n = 1;
 	a = exp(set->zr) * cos(set->zi);
 	b = exp(set->zr) * sin(set->zi);
-	set->zr = a;
-	set->zi = b;
+	c = (t_coor){(double)a, (double)b};
 	while (n < set->max_i)
 	{
-		t_a = exp(a) * cos(b) + set->zr;
-		b = exp(a) * sin(b) + set->zi;
+		t_a = exp(a) * cos(b) + c.a;
+		b = exp(a) * sin(b) + c.b;
 		a = t_a;
 		if (a * a - b * b > set->esc)
-			return (ft_colorize_pixel(set, a, b, n, true));
+			return ((t_orbit_result){
+				.point = {a, b}, .n = n, .escaped = true});
 		n++;
 	}
-	return (ft_colorize_pixel(set, a, b, n, false));
+	return ((t_orbit_result){
+		.point = {a, b}, .n = n, .escaped = false});
 }
 
-int	ft_spider_test(t_set *set)
+/**
+ * @brief Iterate the Spider map using trigonometric and hyperbolic terms.
+ * @param[in] set Pixel coordinates and orbit settings.
+ * @return Final orbit point, iteration count, and escape status.
+ */
+t_orbit_result	ft_spider_test(const t_set *set)
 {
 	int			n;
 	long double	a;
 	long double	b;
 	long double	t_a;
+	t_coor		c;
 
 	n = 1;
 	a = set->zr / (set->zr * set->zr + set->zi * set->zi);
 	b = set->zi / (set->zr * set->zr + set->zi * set->zi);
-	set->zr = a;
-	set->zi = b;
+	c = (t_coor){(double)a, (double)b};
 	while (n < set->max_i)
 	{
-		t_a = cos(a) * ((exp(b) + exp(-b)) / 2) + set->zr;
-		b = -sin(a) * ((exp(b) - exp(-b)) / 2) + set->zi;
+		t_a = cos(a) * ((exp(b) + exp(-b)) / 2) + c.a;
+		b = -sin(a) * ((exp(b) - exp(-b)) / 2) + c.b;
 		a = t_a;
 		if (a * a - b * b > set->esc)
-			return (ft_colorize_pixel(set, a, b, n, true));
+			return ((t_orbit_result){
+				.point = {a, b}, .n = n, .escaped = true});
 		n++;
 	}
-	return (ft_colorize_pixel(set, a, b, n, false));
+	return ((t_orbit_result){
+		.point = {a, b}, .n = n, .escaped = false});
 }
 
-void	ft_iterator(t_set *set, int (f)(t_set *), t_data *img)
+/**
+ * @brief Map each pixel to the complex plane and render its orbit.
+ * @param[in,out] set Fractal settings and per-pixel coordinates.
+ * @param[in] orbit Orbit callback for the active fractal.
+ * @param[out] img Destination pixel buffer.
+ */
+void	ft_iterator(t_set *set, t_builders orbit, t_data *img)
 {
 	int	x;
 	int	y;
@@ -99,8 +126,7 @@ void	ft_iterator(t_set *set, int (f)(t_set *), t_data *img)
 				* (set->viewer->x_width / set->screen_w);
 			set->zi = (y - set->viewer->y_zero)
 				* (set->viewer->y_height / set->screen_h);
-			f(set);
-			ft_put_pixel(img, x, y, set->color);
+			ft_put_pixel(img, x, y, ft_colorize_pixel(set, orbit(set)));
 			y++;
 		}
 		x++;

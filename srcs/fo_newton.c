@@ -1,21 +1,38 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   fo_newton.c                                        +:+      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mporras <mporras@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/11/25 19:47:42 by mporras-          #+#    #+#             */
+/*   Updated: 2026/11/25 19:47:42 by mporras-         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "fractol.h"
 
-static int	ft_newton_root(long double a, long double b)
+/**
+ * @brief Identify a root of z cubed minus one within the tolerance.
+ * @param[in] point Current complex iterate.
+ * @return Root index from 0 to 2, or -1 if no root is close enough.
+ */
+static int	ft_newton_root(t_coor point)
 {
 	static const long double	root[3][2] = {
-		{1.0L, 0.0L},
-		{-0.5L, 0.86602540378443864676L},
-		{-0.5L, -0.86602540378443864676L}
+	{1.0L, 0.0L},
+	{-0.5L, 0.86602540378443864676L},
+	{-0.5L, -0.86602540378443864676L}
 	};
-	long double	dx;
-	long double	dy;
-	int			i;
+	long double					dx;
+	long double					dy;
+	int							i;
 
 	i = 0;
 	while (i < 3)
 	{
-		dx = a - root[i][0];
-		dy = b - root[i][1];
+		dx = point.a - root[i][0];
+		dy = point.b - root[i][1];
 		if (dx * dx + dy * dy < 1e-12L)
 			return (i);
 		i++;
@@ -23,47 +40,48 @@ static int	ft_newton_root(long double a, long double b)
 	return (-1);
 }
 
-static int	ft_newton_color(int root, int iterations)
+/**
+ * @brief Apply the Newton step (2*z + (1/z)^2) / 3.
+ * @param[in] point Current complex iterate.
+ * @param[in] norm Squared magnitude of the current iterate.
+ * @return Next complex iterate.
+ */
+static t_coor	ft_newton_step(t_coor point, long double norm)
 {
-	int	light;
+	t_coor	ratio;
 
-	light = (int)(255 / (1 + 0.08 * iterations));
-	if (root == 0)
-		return (create_trgb(0, light, light / 4, light / 3));
-	if (root == 1)
-		return (create_trgb(0, light / 5, light, light / 2));
-	return (create_trgb(0, light / 4, light / 2, light));
+	ratio.a = point.a / norm;
+	ratio.b = point.b / norm;
+	return ((t_coor){
+		(2 * point.a + ratio.a * ratio.a - ratio.b * ratio.b) / 3,
+		(2 * point.b - 2 * ratio.a * ratio.b) / 3});
 }
 
-int	ft_newton_test(t_set *set)
+/**
+ * @brief Find the Newton basin for z cubed minus one.
+ * @param[in] set Pixel coordinates and iteration limit.
+ * @return Final point, iteration count, and one-based basin if found.
+ */
+t_orbit_result	ft_newton_test(const t_set *set)
 {
-	long double	a;
-	long double	b;
+	t_coor		point;
 	long double	norm;
-	long double	next_a;
 	int			root;
 	int			n;
 
-	a = set->zr;
-	b = set->zi;
+	point = (t_coor){set->zr, set->zi};
 	n = 0;
-	set->color = 0;
 	while (n <= set->max_i)
 	{
-		root = ft_newton_root(a, b);
+		root = ft_newton_root(point);
 		if (root >= 0)
-		{
-			set->color = ft_newton_color(root, n);
-			break;
-		}
-		norm = a * a + b * b;
+			return ((t_orbit_result){.point = point, .n = n,
+				.basin = root + 1});
+		norm = point.a * point.a + point.b * point.b;
 		if (n == set->max_i || norm == 0 || !isfinite(norm))
-			break;
-		/* Newton step for z^3 - 1: (2*z + (1/z)^2) / 3. */
-		next_a = (2 * a + (a / norm) * (a / norm) - (b / norm) * (b / norm)) / 3;
-		b = (2 * b - 2 * (a / norm) * (b / norm)) / 3;
-		a = next_a;
+			break ;
+		point = ft_newton_step(point, norm);
 		n++;
 	}
-	return (1);
+	return ((t_orbit_result){.point = point, .n = n});
 }

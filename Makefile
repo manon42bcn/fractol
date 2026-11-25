@@ -14,44 +14,80 @@ NAME			=	fractol
 SRC_DIR			=	srcs
 OBJ_DIR			=	objs
 SRCS_FILES		=	fo_colorize.c \
+					fo_palette.c \
 					fo_fractal_dir.c \
 					fo_fractal_tests.c \
 					fo_fractal_extra.c \
+					fo_fractal_degree7.c \
+					fo_fractal_phoenix.c \
+					fo_fractal_tricorn.c \
+					fo_fractal_shapes.c \
+					fo_fractal_cosine.c \
+					fo_fractal_sine.c \
+					fo_fractal_rational.c \
+					fo_fractal_rational_offset.c \
+					fo_fractal_rational_square.c \
+					fo_fractal_polynomial.c \
 					fo_newton.c \
 					fo_buddhabrot.c \
+					fo_buddhabrot_orbit.c \
+					fo_buddhabrot_draw.c \
+					fo_nebulabrot_palette.c \
 					fo_fractal_utils.c \
 					fo_handlers.c \
+					fo_color_keys.c \
+					fo_events.c \
 					fo_input_utils.c \
 					fo_iterator.c \
 					fo_messages.c \
 					fo_pixel_utils.c \
 					fo_mouse_zoom.c \
-					fo_string_to_double.c \
 					fo_struct_utils.c \
+					fo_video.c \
+					fo_video_init.c \
 					main.c
-RGB_SRCS		=	rgb_algebra.c rgb_arithmetics.c rgb_interpolate.c rgb_oklab.c
-OBJS			=	$(addprefix $(OBJ_DIR)/,$(SRCS_FILES:.c=.o) $(RGB_SRCS:.c=.o))
+OBJS			=	$(addprefix $(OBJ_DIR)/,$(SRCS_FILES:.c=.o))
 LIB_DIR			=	lib
 LIB				=	libft.a
+RGB_DIR			=	rgb
+RGB_LIB			=	$(OBJ_DIR)/librgb.a
 RM				=	rm -rf
 CFLAGS			=	-Wall -Wextra -Werror
 PKG_CONFIG		?=	pkg-config
 SDL_MIN_VERSION	=	3.2.0
 SDL_CFLAGS		=	$(shell $(PKG_CONFIG) --cflags sdl3)
 SDL_LIBS		=	$(shell $(PKG_CONFIG) --libs sdl3)
-INCLUDES		=	-Iinc -Ilib/inc -Irgb/inc
-FACTOR			=	-D FACTOR=3
+INCLUDES		=	-Iinc -I$(LIB_DIR)/inc -I$(RGB_DIR)/inc
+FACTOR			=	-D FACTOR=2
+ORBIT_TEST_OBJS	=	$(addprefix $(OBJ_DIR)/,fo_fractal_degree7.o \
+					fo_fractal_polynomial.o fo_fractal_rational.o \
+					fo_fractal_rational_offset.o fo_fractal_rational_square.o \
+					fo_fractal_utils.o fo_newton.o)
+NAV_TEST_OBJS	=	$(filter-out $(OBJ_DIR)/main.o,$(OBJS))
 
 all: $(NAME)
 
-$(NAME): $(OBJS) $(LIB_DIR)/$(LIB)
-	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS) $(LIB_DIR)/$(LIB) $(SDL_LIBS) -lm -o $@
+test: $(NAME) $(OBJ_DIR)/test-orbits $(OBJ_DIR)/test-navigation
+	./$(OBJ_DIR)/test-orbits
+	SDL_VIDEODRIVER=dummy SDL_RENDER_DRIVER=software ./$(OBJ_DIR)/test-navigation
+	sh tests/test_cli.sh ./$(NAME)
+	# An up-to-date build must not invoke the compiler or linker.
+	$(MAKE) all CC=false
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c inc/fractol.h rgb/inc/rgb.h $(LIB_DIR)/inc/libft.h | $(OBJ_DIR) check-sdl
+$(OBJ_DIR)/test-orbits: tests/test_orbits.c $(ORBIT_TEST_OBJS) | check-sdl
+	$(CC) $(CPPFLAGS) $(CFLAGS) -UNDEBUG $(SDL_CFLAGS) $(INCLUDES) $(LDFLAGS) -o $@ $^ -lm
+
+$(OBJ_DIR)/test-navigation: tests/test_navigation.c $(NAV_TEST_OBJS) $(LIB_DIR)/$(LIB) $(RGB_LIB) | check-sdl
+	$(CC) $(CPPFLAGS) $(CFLAGS) -UNDEBUG $(SDL_CFLAGS) $(INCLUDES) $(LDFLAGS) -o $@ $^ $(SDL_LIBS) -lm
+
+submodules:
+	git submodule update --init --recursive
+
+$(NAME): $(OBJS) $(LIB_DIR)/$(LIB) $(RGB_LIB)
+	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS) $(LIB_DIR)/$(LIB) $(RGB_LIB) $(SDL_LIBS) -lm -o $@
+
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c inc/fractol.h $(RGB_DIR)/inc/rgb.h $(LIB_DIR)/inc/libft.h | $(OBJ_DIR) check-sdl
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(SDL_CFLAGS) $(INCLUDES) $(FACTOR) -c $< -o $@
-
-$(OBJ_DIR)/%.o: rgb/src/%.c rgb/inc/rgb.h rgb/src/rgb_internal.h $(LIB_DIR)/inc/libft.h | $(OBJ_DIR)
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
 $(OBJ_DIR):
 	mkdir -p $@
@@ -99,15 +135,20 @@ check-sdl:
 $(LIB_DIR)/$(LIB): FORCE
 	$(MAKE) -C $(LIB_DIR) -j1
 
+$(RGB_LIB): FORCE | $(OBJ_DIR)
+	$(MAKE) -C $(RGB_DIR) CC="$(CC)" NAME="$(abspath $@)"
+
 clean:
 	$(MAKE) -C $(LIB_DIR) clean
-	$(RM) $(OBJS)
+	$(MAKE) -C $(RGB_DIR) clean
+	$(RM) $(OBJ_DIR)
 
 fclean: clean
 	$(MAKE) -C $(LIB_DIR) fclean
-	$(RM) $(NAME) $(OBJ_DIR)
+	$(MAKE) -C $(RGB_DIR) fclean NAME="$(abspath $(RGB_LIB))"
+	$(RM) $(NAME)
 
 re: fclean
 	$(MAKE) all
 
-.PHONY: all install-sdl check-sdl clean fclean re FORCE
+.PHONY: all test submodules install-sdl check-sdl clean fclean re FORCE

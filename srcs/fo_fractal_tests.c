@@ -12,7 +12,41 @@
 
 #include "fractol.h"
 
-int	ft_mandelbrot_test(t_set *set)
+/**
+ * @brief Iterate z = z^2 + z + c from z = 0.
+ * @param[in] set Pixel coordinates and orbit settings.
+ * @return Final orbit point, iteration count, and escape status.
+ */
+t_orbit_result	ft_quadratic_linear(const t_set *set)
+{
+	long double	a;
+	long double	b;
+	long double	next_a;
+	int			n;
+
+	a = 0;
+	b = 0;
+	n = 1;
+	while (n <= set->max_i)
+	{
+		next_a = a * a - b * b + a + set->zr;
+		b = 2 * a * b + b + set->zi;
+		a = next_a;
+		if (a * a + b * b > set->esc)
+			return ((t_orbit_result){
+				.point = {a, b}, .n = n, .escaped = true});
+		n++;
+	}
+	return ((t_orbit_result){
+		.point = {a, b}, .n = set->max_i, .escaped = false});
+}
+
+/**
+ * @brief Iterate the quadratic Mandelbrot map for the current pixel.
+ * @param[in] set Pixel coordinates and orbit settings.
+ * @return Final orbit point, iteration count, and escape status.
+ */
+t_orbit_result	ft_mandelbrot_test(const t_set *set)
 {
 	int			n;
 	long double	a;
@@ -28,50 +62,20 @@ int	ft_mandelbrot_test(t_set *set)
 		b = 2 * a * b + set->zi;
 		a = t_a;
 		if (a * a + b * b > set->esc)
-			return (ft_colorize_pixel(set, a, b, n, true));
+			return ((t_orbit_result){
+				.point = {a, b}, .n = n, .escaped = true});
 		n++;
 	}
-	return (ft_colorize_pixel(set, a, b, n, false));
+	return ((t_orbit_result){
+		.point = {a, b}, .n = n, .escaped = false});
 }
 
-int	ft_tricorn_test(t_set *set)
-{
-	int				n;
-	long double	a;
-	long double	b;
-	long double	next_a;
-	long double	c_r;
-	long double	c_i;
-	long double	escape;
-
-	n = 1;
-	a = 0;
-	b = 0;
-	c_r = set->zr;
-	c_i = set->zi;
-	escape = set->esc;
-	if (set->tricorn_julia)
-	{
-		a = set->zr;
-		b = set->zi;
-		c_r = set->c_r;
-		c_i = set->c_i;
-		/* A large selected constant can require a larger escape radius. */
-		escape = fmaxl(escape, c_r * c_r + c_i * c_i);
-	}
-	while (n < set->max_i)
-	{
-		next_a = a * a - b * b + c_r;
-		b = -2 * a * b + c_i;
-		a = next_a;
-		if (a * a + b * b > escape)
-			return (ft_colorize_pixel(set, a, b, n, true));
-		n++;
-	}
-	return (ft_colorize_pixel(set, a, b, n, false));
-}
-
-int	ft_julia_test(t_set *set)
+/**
+ * @brief Iterate the quadratic Julia map using the selected complex constant.
+ * @param[in] set Pixel coordinates, Julia constant, and orbit settings.
+ * @return Final orbit point, iteration count, and escape status.
+ */
+t_orbit_result	ft_julia_test(const t_set *set)
 {
 	int		n;
 	double	a;
@@ -87,15 +91,22 @@ int	ft_julia_test(t_set *set)
 		b = 2.0 * a * b + set->c_r;
 		a = t_a;
 		if (a * a + b * b > set->esc)
-			return (ft_colorize_pixel(set, a, b, n, true));
+			return ((t_orbit_result){
+				.point = {a, b}, .n = n, .escaped = true});
 		if (t_a == b)
 			n = set->max_i - 1;
 		n++;
 	}
-	return (ft_colorize_pixel(set, a, b, n, false));
+	return ((t_orbit_result){
+		.point = {a, b}, .n = n, .escaped = false});
 }
 
-int	ft_burningship_test(t_set *set)
+/**
+ * @brief Iterate the Burning Ship map using absolute coordinate components.
+ * @param[in] set Pixel coordinates and orbit settings.
+ * @return Final orbit point, iteration count, and escape status.
+ */
+t_orbit_result	ft_burningship_test(const t_set *set)
 {
 	int			n;
 	long double	a;
@@ -115,54 +126,10 @@ int	ft_burningship_test(t_set *set)
 		b += set->zi;
 		a = t_a;
 		if (a * a + b * b > set->esc)
-			return (ft_colorize_pixel(set, a, b, n, true));
+			return ((t_orbit_result){
+				.point = {a, b}, .n = n, .escaped = true});
 		n++;
 	}
-	return (ft_colorize_pixel(set, a, b, n, false));
-}
-
-int	ft_drop_test(t_set *set)
-{
-	int			n;
-	long double	a;
-	long double	b;
-	long double	t_a;
-
-	n = 1;
-	a = set->zr / (set->zr * set->zr + set->zi * set->zi);
-	b = set->zi / (set->zr * set->zr + set->zi * set->zi);
-	set->zr = a;
-	set->zi = b;
-	while (n < set->max_i)
-	{
-		t_a = (a * a - b * b) + set->zr;
-		b = 2.0 * a * b + set->zi;
-		a = t_a;
-		if (a * a + b * b > set->esc)
-			return (ft_colorize_pixel(set, a, b, n, true));
-		n++;
-	}
-	return (ft_colorize_pixel(set, a, b, n, false));
-}
-
-int	ft_bird_test(t_set *set)
-{
-	int			n;
-	long double	a;
-	long double	b;
-	long double	t_a;
-
-	n = 1;
-	a = 1.0f / set->zr;
-	b = 1.0f / set->zi;
-	while (n < set->max_i)
-	{
-		t_a = 1.0f / (a * a - b * b) + set->zr;
-		b = 1.0f / 2.0 * a * b + set->zi;
-		a = t_a;
-		if (a * a - b * b > set->esc)
-			return (ft_colorize_pixel(set, a, b, n, true));
-		n++;
-	}
-	return (ft_colorize_pixel(set, a, b, n, false));
+	return ((t_orbit_result){
+		.point = {a, b}, .n = n, .escaped = false});
 }

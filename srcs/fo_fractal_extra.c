@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   fo_fractal_tests.c                                 :+:      :+:    :+:   */
+/*   fo_fractal_extra.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mporras <mporras@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -12,7 +12,12 @@
 
 #include "fractol.h"
 
-int	ft_mandelbrot_test3(t_set *set)
+/**
+ * @brief Iterate z = z^3 + c for the current pixel.
+ * @param[in] set Pixel coordinates and orbit settings.
+ * @return Final orbit point, iteration count, and escape status.
+ */
+t_orbit_result	ft_mandelbrot_test3(const t_set *set)
 {
 	int			n;
 	long double	a;
@@ -28,35 +33,20 @@ int	ft_mandelbrot_test3(t_set *set)
 		b = (3 * (a * a) * b - b * b * b) + set->zi;
 		a = t_a;
 		if (a * a + b * b > set->esc)
-			return (ft_colorize_pixel(set, a, b, n, true));
+			return ((t_orbit_result){
+				.point = {a, b}, .n = n, .escaped = true});
 		n++;
 	}
-	return (ft_colorize_pixel(set, a, b, n, false));
+	return ((t_orbit_result){
+		.point = {a, b}, .n = n, .escaped = false});
 }
 
-int	ft_mandelbrot_test7(t_set *set)
-{
-	int			n;
-	long double	a;
-	long double	b;
-	long double	t_a;
-
-	n = 1;
-	a = set->zr;
-	b = set->zi;
-	while (n < set->max_i)
-	{
-		t_a = (a * a - b * b) + set->zr;
-		b = 2 * a * b + set->zi;
-		a = t_a;
-		if (a * a + b * b > set->esc)
-			return (ft_colorize_pixel(set, a, b, n, true));
-		n++;
-	}
-	return (ft_colorize_pixel(set, a, b, n, false));
-}
-
-int	ft_julia_test3(t_set *set)
+/**
+ * @brief Iterate the cubic Julia variant using the selected constant components.
+ * @param[in] set Pixel coordinates, Julia constant, and orbit settings.
+ * @return Final orbit point, iteration count, and escape status.
+ */
+t_orbit_result	ft_julia_test3(const t_set *set)
 {
 	int		n;
 	double	a;
@@ -72,103 +62,12 @@ int	ft_julia_test3(t_set *set)
 		b = (3.0 * (a * a) * b - b * b * b) + set->c_r;
 		a = t_a;
 		if (a * a + b * b > set->esc)
-			return (ft_colorize_pixel(set, a, b, n, true));
+			return ((t_orbit_result){
+				.point = {a, b}, .n = n, .escaped = true});
 		if (t_a == b)
 			n = set->max_i - 1;
 		n++;
 	}
-	return (ft_colorize_pixel(set, a, b, n, false));
-}
-
-int	ft_julia_test7(t_set *set)
-{
-	int		n;
-	double	a;
-	double	b;
-	double	t_a;
-
-	n = 0;
-	a = set->zr;
-	b = set->zi;
-	while (n < set->max_i)
-	{
-		t_a = (a * a * a * a * a * a * a) - (21 * ((a * a * a * a * a)
-					* (b * b))) + (35 * ((a * a * a) * (b * b * b * b)))
-			- (7 * a * (b * b * b * b * b * b)) + set->c_i;
-		b = 7 * b * (a * a * a * a * a * a) - (35 * ((a * a * a * a)
-					* (b * b * b))) + (21 * ((a * a) * (b * b * b * b * b)))
-			- (b * b * b * b * b * b * b) + set->c_r;
-		a = t_a;
-		if (a * a + b * b > set->esc)
-			return (ft_colorize_pixel(set, a, b, n, true));
-		if (t_a == b)
-			n = set->max_i - 1;
-		n++;
-	}
-	return (ft_colorize_pixel(set, a, b, n, false));
-}
-
-int	ft_drop_test7(t_set *set)
-{
-	int			n;
-	long double	a;
-	long double	b;
-	long double	t_a;
-
-	n = 1;
-	a = set->zr / (set->zr * set->zr + set->zi * set->zi);
-	b = set->zi / (set->zr * set->zr + set->zi * set->zi);
-	set->zr = a;
-	set->zi = b;
-	while (n < set->max_i)
-	{
-		t_a = (a * a * a * a * a * a * a) - (21 * ((a * a * a * a * a)
-					* (b * b))) + (35 * ((a * a * a) * (b * b * b * b)))
-			- (7 * a * (b * b * b * b * b * b)) + set->zr;
-		b = 7 * b * (a * a * a * a * a * a) - (35 * ((a * a * a * a)
-					* (b * b * b))) + (21 * ((a * a) * (b * b * b * b * b)))
-			- (b * b * b * b * b * b * b) + set->zi;
-		a = t_a;
-		if (a * a + b * b > set->esc)
-			return (ft_colorize_pixel(set, a, b, n, true));
-		n++;
-	}
-	return (ft_colorize_pixel(set, a, b, n, false));
-}
-
-int	ft_phoenix_test(t_set *set)
-{
-	long double	a;
-	long double	b;
-	long double	prev_a;
-	long double	prev_b;
-	long double	next_a;
-	long double	next_b;
-	long double	norm;
-	long double	constant_bound;
-	int			n;
-
-	a = set->zr;
-	b = set->zi;
-	prev_a = 0;
-	prev_b = 0;
-	constant_bound = fabsl(set->c_r) + fabsl(set->c_i);
-	n = 0;
-	while (n < set->max_i)
-	{
-		next_a = a * a - b * b + set->c_r - 0.5L * prev_a;
-		next_b = 2 * a * b + set->c_i - 0.5L * prev_b;
-		prev_a = a;
-		prev_b = b;
-		a = next_a;
-		b = next_b;
-		n++;
-		norm = a * a + b * b;
-		/* With |prev| <= |z|, the next magnitude is at least |z|² - 0.5|z| - |c|. */
-		if (norm > set->esc && norm >= prev_a * prev_a + prev_b * prev_b
-			&& (constant_bound <= 1 || isinf(norm)
-				|| norm - 1.5L * sqrtl(norm) > constant_bound))
-			return (ft_colorize_pixel(set, a, b, n, true));
-	}
-	return (ft_colorize_pixel(set, a, b, n, false));
+	return ((t_orbit_result){
+		.point = {a, b}, .n = n, .escaped = false});
 }

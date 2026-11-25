@@ -12,27 +12,31 @@
 
 #include "fractol.h"
 
+/**
+ * @brief Restore the default view, including Tricorn mode.
+ * @param[in,out] set State containing the active view and Tricorn mode.
+ */
 void	ft_reset_viewer(t_set *set)
 {
 	set->zoom = 1.0f;
-	set->viewer->zoom_f = 0.50f;
-	set->viewer->x_zero = set->screen_w / 2.0;
-	set->viewer->y_zero = set->screen_h / 2.0;
-	set->viewer->x_width = 5.1;
-	set->viewer->y_height = 3;
+	ft_viewer_defaults(set->viewer, set);
 	if (set->fractal == TRICORN)
-	{
 		set->tricorn_julia = false;
-		set->viewer->x_width = DEFAULT_VIEW_WIDTH;
-		set->viewer->y_height = DEFAULT_VIEW_HEIGHT;
-	}
+	else if (set->fractal != RATIONAL_OFFSET_0001)
+		set->viewer->x_width = 5.1;
 }
 
+/**
+ * @brief Magnify the current view around the cursor.
+ * @param[in,out] set State containing the view and zoom settings.
+ * @param[in] x_pointer Cursor column in window coordinates.
+ * @param[in] y_pointer Cursor row in window coordinates.
+ */
 inline static void	ft_zoom_in(t_set *set, int x_pointer, int y_pointer)
 {
 	long double	zoom_x;
 	long double	zoom_y;
-	int				aspect;
+	int			aspect;
 
 	aspect = set->screen_w / set->screen_h;
 	if (aspect < 1)
@@ -48,11 +52,17 @@ inline static void	ft_zoom_in(t_set *set, int x_pointer, int y_pointer)
 	set->viewer->y_zero += (zoom_y * -1);
 }
 
+/**
+ * @brief Reduce magnification around the cursor.
+ * @param[in,out] set State containing the view and zoom settings.
+ * @param[in] x_pointer Cursor column in window coordinates.
+ * @param[in] y_pointer Cursor row in window coordinates.
+ */
 inline static void	ft_zoom_out(t_set *set, int x_pointer, int y_pointer)
 {
 	long double	zoom_x;
 	long double	zoom_y;
-	int				aspect;
+	int			aspect;
 
 	aspect = set->screen_w / set->screen_h;
 	if (aspect < 1)
@@ -68,6 +78,13 @@ inline static void	ft_zoom_out(t_set *set, int x_pointer, int y_pointer)
 	set->viewer->y_zero -= (zoom_y * -1);
 }
 
+/**
+ * @brief Apply a wheel-driven zoom and request a redraw.
+ * @param[in,out] set State containing the active view and redraw flag.
+ * @param[in] scroll Signed vertical scroll amount.
+ * @param[in] x Cursor column in window coordinates.
+ * @param[in] y Cursor row in window coordinates.
+ */
 void	ft_mouse_zoom(t_set *set, float scroll, int x, int y)
 {
 	if (scroll > 0)
@@ -75,16 +92,22 @@ void	ft_mouse_zoom(t_set *set, float scroll, int x, int y)
 	else if (scroll < 0)
 		ft_zoom_out(set, x, y);
 	else
-		return;
+		return ;
 	set->status = 1;
 }
 
+/**
+ * @brief Set the complex constant from a click when supported.
+ * @param[in,out] set View, complex constant, and redraw flag.
+ * @param[in] x Selected column in window coordinates.
+ * @param[in] y Selected row in window coordinates.
+ */
 void	ft_mouse_select(t_set *set, int x, int y)
 {
 	if (set->fractal != JULIA && set->fractal != JULIA3
 		&& set->fractal != JULIA7 && set->fractal != PHOENIX
 		&& set->fractal != TRICORN)
-		return;
+		return ;
 	if (set->fractal == TRICORN)
 		set->tricorn_julia = true;
 	set->c_r = (x - set->viewer->x_zero)
