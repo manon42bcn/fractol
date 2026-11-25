@@ -12,7 +12,7 @@ You need Git, a C compiler, Make, pkg-config (or pkgconf), and the
 1. Clone the project and initialize its dependencies.
 
    ```sh
-   git clone https://github.com/manon42bcn/fractol.git
+   git clone git@github.com:manon42bcn/fractol.git
    cd fractol
    make submodules
    ```
