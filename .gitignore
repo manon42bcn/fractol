@@ -4,7 +4,5 @@
 *.dylib
 *.swiftdoc
 *.swiftmodule
-/objs/librgb.a
-/objs/test-orbits
-/objs/test-navigation
+/objs/
 fractol

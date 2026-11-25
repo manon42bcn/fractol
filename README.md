@@ -45,6 +45,9 @@ You need Git, a C compiler, Make, pkg-config (or pkgconf), and the
 
 The [Makefile](Makefile) uses pkg-config to find SDL3. It builds and links
 the static libraries `libft.a` and `librgb.a` from the submodules.
+The application's object files go into `objs/`, which Git ignores.
+The submodules build their objects in `lib/obj/` and `rgb/obj/`.
+Use `make clean` to remove the compiled objects.
 
 ## Controls
 
