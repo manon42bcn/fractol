@@ -14,9 +14,11 @@ NAME			=	fractol
 SRC_DIR			=	srcs
 OBJ_DIR			=	objs
 SRCS_FILES		=	fo_colorize.c \
+					fo_smooth_color.c \
 					fo_palette.c \
 					fo_fractal_dir.c \
 					fo_fractal_tests.c \
+					fo_mandelbrot_distance.c \
 					fo_fractal_extra.c \
 					fo_fractal_degree7.c \
 					fo_fractal_phoenix.c \
@@ -64,11 +66,15 @@ ORBIT_TEST_OBJS	=	$(addprefix $(OBJ_DIR)/,fo_fractal_degree7.o \
 					fo_fractal_rational_offset.o fo_fractal_rational_square.o \
 					fo_fractal_utils.o fo_newton.o)
 NAV_TEST_OBJS	=	$(filter-out $(OBJ_DIR)/main.o,$(OBJS))
+COLOR_TEST_OBJS	=	$(addprefix $(OBJ_DIR)/,fo_fractal_tests.o \
+					fo_mandelbrot_distance.o fo_smooth_color.o fo_palette.o \
+					fo_pixel_utils.o fo_colorize.o)
 
 all: $(NAME)
 
-test: $(NAME) $(OBJ_DIR)/test-orbits $(OBJ_DIR)/test-navigation
+test: $(NAME) $(OBJ_DIR)/test-orbits $(OBJ_DIR)/test-navigation $(OBJ_DIR)/test-colors
 	./$(OBJ_DIR)/test-orbits
+	./$(OBJ_DIR)/test-colors
 	SDL_VIDEODRIVER=dummy SDL_RENDER_DRIVER=software ./$(OBJ_DIR)/test-navigation
 	sh tests/test_cli.sh ./$(NAME)
 	# An up-to-date build must not invoke the compiler or linker.
@@ -79,6 +85,9 @@ $(OBJ_DIR)/test-orbits: tests/test_orbits.c $(ORBIT_TEST_OBJS) | check-sdl
 
 $(OBJ_DIR)/test-navigation: tests/test_navigation.c $(NAV_TEST_OBJS) $(LIB_DIR)/$(LIB) $(RGB_LIB) | check-sdl
 	$(CC) $(CPPFLAGS) $(CFLAGS) -UNDEBUG $(SDL_CFLAGS) $(INCLUDES) $(LDFLAGS) -o $@ $^ $(SDL_LIBS) -lm
+
+$(OBJ_DIR)/test-colors: tests/test_colors.c $(COLOR_TEST_OBJS) $(RGB_LIB) | check-sdl
+	$(CC) $(CPPFLAGS) $(CFLAGS) -UNDEBUG $(SDL_CFLAGS) $(INCLUDES) $(LDFLAGS) -o $@ $^ -lm
 
 submodules:
 	git submodule update --init --recursive

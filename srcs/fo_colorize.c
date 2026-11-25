@@ -13,26 +13,6 @@
 #include "fractol.h"
 
 /**
- * @brief Compute a fractional escape count for supported quadratic maps.
- * @param[in] set Fractal type and squared escape threshold.
- * @param[in] point Complex coordinate at escape.
- * @param[in] n Integer escape iteration.
- * @return Smoothed count, or the original count when smoothing does not apply.
- */
-static double	ft_color_iterations(const t_set *set, t_coor point, int n)
-{
-	long double	norm;
-
-	if (set->fractal != MALDELBROT && set->fractal != JULIA
-		&& set->fractal != TRICORN && set->fractal != BURNINGSHIP)
-		return (n);
-	norm = point.a * point.a + point.b * point.b;
-	if (!isfinite(norm) || norm <= 1 || set->esc <= 1)
-		return (n);
-	return (fmax(0, n + 1 - log2l(logl(norm) / logl(set->esc))));
-}
-
-/**
  * @brief Map a final orbit coordinate to a channel in full color mode.
  * @param[in] coordinate Real or imaginary orbit coordinate.
  * @return Channel intensity in the range 0 to 255.
@@ -95,12 +75,13 @@ int	ft_colorize_pixel(const t_set *set, t_orbit_result result)
 	double	iterations;
 	double	fraction;
 	int		level;
+	int		color;
 
 	if (result.basin > 0)
 		return (ft_newton_color(result.basin - 1, result.n));
 	if (!result.escaped)
 		return (0);
-	iterations = ft_color_iterations(set, result.point, result.n);
+	iterations = ft_smooth_iterations(set, result.point, result.n);
 	fraction = fmin(iterations / set->max_i, 1.0);
 	level = 32 + (int)(223 * fraction);
 	if (set->color_mode == 2)
@@ -111,5 +92,8 @@ int	ft_colorize_pixel(const t_set *set, t_orbit_result result)
 		return (create_trgb((int)(224 * fraction),
 			ft_full_channel(result.point.a),
 			ft_full_channel(result.point.b), level));
-	return (ft_scheme_color(set, iterations));
+	color = ft_scheme_color(set, iterations);
+	if (result.distance > 0)
+		color = ft_shade_distance(set, color, result.distance);
+	return (color);
 }

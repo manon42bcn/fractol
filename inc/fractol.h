@@ -112,10 +112,11 @@ typedef struct s_coor
  */
 typedef struct s_orbit_result
 {
-	t_coor	point;
-	int		n;
-	bool	escaped;
-	int		basin;
+	t_coor		point;
+	int			n;
+	bool		escaped;
+	int			basin;
+	long double	distance;
 }	t_orbit_result;
 
 typedef enum e_palette_interpolation
@@ -136,6 +137,7 @@ typedef struct s_set
 	int							palette_span;
 	int							palette_anchor;
 	bool						palette_single_color;
+	bool						distance_shading;
 	bool						tricorn_julia;
 	t_viewer					*viewer;
 	int							screen_w;
@@ -164,6 +166,7 @@ typedef t_orbit_result	(*t_builders)(const t_set *set);
 
 const char		*ft_fractal_titles(int index);
 t_orbit_result	ft_mandelbrot_test(const t_set *set);
+t_orbit_result	ft_mandelbrot_distance_test(const t_set *set);
 t_orbit_result	ft_tricorn_test(const t_set *set);
 t_orbit_result	ft_newton_test(const t_set *set);
 t_orbit_result	ft_phoenix_test(const t_set *set);
@@ -203,6 +206,9 @@ t_orbit_result	ft_julia_test7(const t_set *set);
 t_orbit_result	ft_drop_test7(const t_set *set);
 void			ft_iterator(t_set *set, t_builders orbit, t_data *img);
 int				ft_colorize_pixel(const t_set *set, t_orbit_result result);
+double			ft_smooth_iterations(const t_set *set, t_coor point, int n);
+int				ft_shade_distance(const t_set *set, int color,
+					long double distance);
 bool			ft_orbit_escaped(t_coor point, long double escape);
 t_orbit_result	ft_orbit_pole(int n);
 int				ft_scheme_color(const t_set *set, double iterations);

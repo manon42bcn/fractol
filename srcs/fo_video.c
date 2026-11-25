@@ -32,7 +32,11 @@ static void	ft_fractol_manager(t_set *set, t_data *img)
 		ft_quadratic_c_plus_c_squared
 	};
 
-	ft_iterator(set, build[set->fractal], img);
+	if (set->fractal == MALDELBROT && set->color_mode == 1
+		&& set->distance_shading)
+		ft_iterator(set, ft_mandelbrot_distance_test, img);
+	else
+		ft_iterator(set, build[set->fractal], img);
 }
 
 /**
@@ -61,6 +65,9 @@ static void	ft_update_palette_title(const t_set *set)
 			"%s | Palette %d | %d iterations/step | %s", name,
 			set->color_scheme + 1, set->palette_span,
 			interpolation[set->palette_interpolation]);
+	if (set->distance_shading && set->fractal == MALDELBROT
+		&& set->color_mode == 1)
+		SDL_strlcat(title, " | Distance shading", sizeof(title));
 	if (SDL_strcmp(title, SDL_GetWindowTitle(set->window)) != 0)
 		SDL_SetWindowTitle(set->window, title);
 }

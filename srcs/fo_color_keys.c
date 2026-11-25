@@ -106,6 +106,12 @@ static bool	ft_keys_buddhabrot(SDL_Keycode key, t_set *set)
  */
 bool	ft_keys_special(SDL_Keycode key, t_set *set)
 {
+	if (key == SDLK_D && set->fractal == MALDELBROT && set->color_mode == 1)
+	{
+		set->distance_shading = !set->distance_shading;
+		set->status = 1;
+		return (true);
+	}
 	if (key == SDLK_L && set->fractal != NEWTON)
 	{
 		ft_keys_interpolation(set);
